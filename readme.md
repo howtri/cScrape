@@ -10,3 +10,6 @@ Request for a web pages content
 
 ## Python CLI
 Use sockets to make requests to the C webserver.
+
+## Push from CLI
+git -c http.sslVerify=false clone https://tristan.howell:<PAT>@code.levelup.cce.af.mil/tristan.howell/howell_17d_19_1.git
