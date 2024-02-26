@@ -12,6 +12,6 @@ Request for a web pages content
 Use sockets to make requests to the C webserver.
 
 ## Push from CLI
-git -c http.sslVerify=false clone https://tristan.howell:<PAT>@code.levelup.cce.af.mil/tristan.howell/howell_17d_19_1.git
+git -c http.sslVerify=false clone https://<user.name>>:<PAT>@code.levelup.cce.af.mil/tristan.howell/howell_17d_19_1.git
 
 git -c http.sslVerify=false push origin main
