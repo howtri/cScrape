@@ -1,18 +1,21 @@
-# Run: make -f Makefile
+# Run: make
 # Compiler to use
 CC = gcc
 
 # Compiler flags
-CFLAGS = -std=c17 -g -Wall -I./include
+CFLAGS = -std=c17 -g -Wall -I$(INCDIR)
+
+SRCDIR = src
+INCDIR = include
 
 # Source files for this program
-SRCS = program_main.c program_extra.c
+SRCS = $(SRCDIR)/web_scraper_main.c $(SRCDIR)/web_scraper_server.c
 
 # Header files
-HEADERS = program_main.h program_extra.h
+HEADERS = $(INCDIR)/web_scraper_server.h
 
 # Executable name
-TARGET = program
+TARGET = web_scraper
 
 # Build rule
 $(TARGET): $(SRCS) $(HEADERS)

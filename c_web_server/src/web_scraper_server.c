@@ -2,6 +2,8 @@
 
 #include "web_scraper_server.h"
 
+#define PORT 8081
+
 struct sockaddr_in
 initialize_server_address ()
 {
@@ -16,18 +18,18 @@ initialize_server_address ()
 
 // Creates a socket, server_address, and begins listening on the socket.
 int
-start_server ()
+start_server (int max_connections)
 {
-    int socket_fd = create_listening_socket();
-        if (-1 == socket_fd)
-        {
-            perror("Failed to create socket");
-            return -1;
-        }
+    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (-1 == socket_fd)
+    {
+        perror("Failed to create socket");
+        return -1;
+    }
 
     struct sockaddr_in address = initialize_server_address();
 
-    // Binds the socket to our address.
+    // Casts from an IPv4 address to a generic address, IPv4 address is compatible with generic address.
     if (bind(socket_fd, (struct sockaddr *)&address, sizeof(address)) == -1)
     {
         close(socket_fd);
@@ -36,7 +38,7 @@ start_server ()
     }
 
     // Passively accept connections.
-    if (listen(socket_fd, MAX_CONNECTIONS) == -1)
+    if (listen(socket_fd, max_connections) == -1)
     {
         close(socket_fd);
         perror("Failed to listen on the socket fd");
@@ -44,13 +46,6 @@ start_server ()
     }
 
     return socket_fd;
-}
-
-int
-cleanup_server (int socket)
-{
-    close(socket);
-    return 0;
 }
 
 int
@@ -79,7 +74,8 @@ void accept_new_connections(int listening_socket, struct pollfd p_fds[], int max
     }
 
     for (int i = 1; i < max_connections; ++i) {
-        if (p_fds[i].fd == -1) { // Found an empty slot.
+        // Slot is empty/unused when -1.
+        if (p_fds[i].fd == -1) {
             p_fds[i].fd = new_socket;
             p_fds[i].events = POLLIN;
             return;
@@ -87,11 +83,12 @@ void accept_new_connections(int listening_socket, struct pollfd p_fds[], int max
     }
 
     fprintf(stderr, "No available slots for new connections.\n");
-    close(new_socket); // Important to close the socket if we can't handle it.
+    // Close the socket if we can't handle it.
+    close(new_socket);
 }
 
 ssize_t
-receive_message (int connection_socket, char *p_buffer, size_t buffer_size)
+receive_message (int connection_socket, char * p_buffer, size_t buffer_size)
 {
     // Retain space for a null-byte terminator.
     ssize_t bytes_read = read(connection_socket, p_buffer, buffer_size - 1);
@@ -153,6 +150,13 @@ void handling_loop(int listening_socket, int max_connections) {
     }
 
     free(p_fds);
+}
+
+int
+cleanup_server (int socket)
+{
+    close(socket);
+    return 0;
 }
 
 // end of file.

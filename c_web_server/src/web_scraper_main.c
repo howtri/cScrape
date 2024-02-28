@@ -9,7 +9,7 @@
 int
 main ()
 {
-    int listening_socket = start_server();
+    int listening_socket = start_server(MAX_CONNECTIONS);
     if (listening_socket < 0)
     {
         fprintf(stderr, "Failed to create a listening socket.\n");

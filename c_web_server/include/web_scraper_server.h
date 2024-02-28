@@ -22,7 +22,7 @@ struct sockaddr_in initialize_server_address(void);
  * 
  * @return int The socket file descriptor of the listening socket, or -1 on error.
  */
-int start_server(void);
+int start_server(int max_connections);
 
 /**
  * Cleans up server resources associated with the socket.
