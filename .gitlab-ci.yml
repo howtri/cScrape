@@ -1,36 +1,31 @@
+image: ubuntu:latest
+
 stages:
   - build
   - test
 
-variables:
-  # Define where the built files will be stored relative to the repository root
-  BUILD_DIR: "bin"
-
 before_script:
-  # Install dependencies (cmocka for testing, etc.)
+  # Use non-interactive frontend to avoid user prompts
+  - export DEBIAN_FRONTEND=noninteractive
+  # Update and install dependencies
   - apt-get update && apt-get install -y build-essential libcmocka-dev
 
 build:
   stage: build
   script:
-    # Compile the project using the Makefile
     - make
   artifacts:
     paths:
-      # Store the built executable as an artifact
-      - $BUILD_DIR/
+      - bin/
     expire_in: 1 hour
   only:
-    # Run this job only on pushes to these branches
     - main
     - dev
 
 test:
   stage: test
   script:
-    # Run tests using the Makefile
     - make test
   only:
-    # Run this job only on pushes to these branches
     - main
     - dev
