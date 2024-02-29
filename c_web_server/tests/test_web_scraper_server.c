@@ -1,4 +1,6 @@
 #include <stdarg.h>
+#include <stdint.h>
+#include <inttypes.h> 
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
