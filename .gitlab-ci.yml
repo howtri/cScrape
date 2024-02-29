@@ -1,9 +1,5 @@
 image: gcc
 
-stages:
-  - build
-  - test
-
 before_script:
   # Use non-interactive frontend to avoid user prompts
   - export DEBIAN_FRONTEND=noninteractive
@@ -18,14 +14,8 @@ build:
     paths:
       - bin/
     expire_in: 1 hour
-  only:
-    - main
-    - dev
 
 test:
   stage: test
   script:
     - make test
-  only:
-    - main
-    - dev
