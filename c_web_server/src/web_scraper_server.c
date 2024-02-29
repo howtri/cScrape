@@ -2,6 +2,7 @@
 
 #include "web_scraper_server.h"
 
+// Create an IPv4 socket address.
 struct sockaddr_in
 initialize_server_address ()
 {
