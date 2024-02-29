@@ -1,8 +1,7 @@
 before_script:
-  # Use non-interactive frontend to avoid user prompts
-  - export DEBIAN_FRONTEND=noninteractive
-  # Update and install dependencies
-  - apt-get update && apt-get install -y build-essential libcmocka-dev
+  # Update package repository and install necessary tools
+  - yum update -y
+  - yum install -y make gcc libcmocka-devel
 
 build:
   stage: build
