@@ -2,7 +2,7 @@ before_script:
   # Install build essentials
   - yum install -y git gcc make cmake
   # Clone the cmocka source code from the official Git repository
-  - git clone https://git.cryptomilk.org/projects/cmocka.git
+  - git clone https://github.com/clibs/cmocka.git
   # Build and install cmocka
   - mkdir cmocka/build && cd cmocka/build
   - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
