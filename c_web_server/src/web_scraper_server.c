@@ -2,8 +2,6 @@
 
 #include "web_scraper_server.h"
 
-#define PORT 8081
-
 struct sockaddr_in
 initialize_server_address ()
 {
