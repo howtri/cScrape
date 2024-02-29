@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define PORT 8081
+#define PORT 8082
 
 /**
  * Initializes server address settings.

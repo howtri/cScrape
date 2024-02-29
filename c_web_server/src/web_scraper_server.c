@@ -90,6 +90,7 @@ receive_message (int connection_socket, char * p_buffer, size_t buffer_size)
 {
     // Retain space for a null-byte terminator.
     ssize_t bytes_read = read(connection_socket, p_buffer, buffer_size - 1);
+    printf("Bytesm read %d.\n", bytes_read);
     if (-1 == bytes_read)
     {
         perror("Failed to read from socket");

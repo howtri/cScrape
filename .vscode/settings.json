@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "setjmp.h": "c"
+        "setjmp.h": "c",
+        "string.h": "c",
+        "stdbool.h": "c"
     }
 }
