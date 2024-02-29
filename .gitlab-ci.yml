@@ -1,4 +1,4 @@
-image:docker
+image: docker
 
 before_script:
   # Use non-interactive frontend to avoid user prompts
