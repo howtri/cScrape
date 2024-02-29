@@ -1,4 +1,4 @@
-image: gcc
+image: gcc:12
 
 before_script:
   # Use non-interactive frontend to avoid user prompts
