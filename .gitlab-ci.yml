@@ -1,7 +1,15 @@
 before_script:
-  # Update package repository and install necessary tools
-  - yum update -y
-  - yum install -y make gcc libcmocka-devel
+  # Install build essentials
+  - yum install -y git gcc make cmake
+  # Clone the cmocka source code from the official Git repository
+  - git clone https://git.cryptomilk.org/projects/cmocka.git
+  # Build and install cmocka
+  - mkdir cmocka/build && cd cmocka/build
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+  - make
+  - make install
+  # Go back to the previous directory
+  - cd ../../
 
 build:
   stage: build
