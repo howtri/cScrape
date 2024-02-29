@@ -1,7 +1,7 @@
 before_script:
   # Update package repository and install necessary tools
   - yum update -y
-  - yum install -y make gcc libcmocka
+  - yum install -y make gcc libcmocka-dev
 
 build:
   stage: build
