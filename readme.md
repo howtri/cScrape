@@ -8,6 +8,14 @@ Accepts:
 Request to scrape a webpage
 Request for a web pages content
 
+### Architecture
+Diagram
+
+Reason for Monolith
+- ease of initial development
+- not multiple teams/developers for splitting work
+- expected low number of qps
+
 ## Python CLI
 Use sockets to make requests to the C webserver.
 
