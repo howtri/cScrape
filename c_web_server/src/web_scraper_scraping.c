@@ -5,25 +5,21 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include "web_scraper_scraping.h"
-#include "web_scraper_queue.h"
 #include "web_scraper_utils.h"
-
-#define PORT 80
-#define BUFFER_SIZE 4096
 
 int resolve_hostname_to_ip(const char * p_hostname, struct sockaddr_in * p_serv_addr) {
     struct hostent * p_host = gethostbyname(p_hostname);
     if (p_host == NULL || p_host->h_addr_list[0] == NULL) {
         perror("DNS resolution failed");
-        return -1;
+        return EXIT_FAILURE;
     }
 
     memset(p_serv_addr, 0, sizeof(*p_serv_addr));
     p_serv_addr->sin_family = AF_INET;
-    p_serv_addr->sin_port = htons(PORT);
+    p_serv_addr->sin_port = htons(CLIENT_PORT);
     memcpy(&p_serv_addr->sin_addr, p_host->h_addr_list[0], p_host->h_length);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int create_and_connect_socket(const struct sockaddr_in * p_serv_addr) {
@@ -52,11 +48,19 @@ void send_http_get_request(int sock, const char * p_hostname, const char * p_pat
     }
 }
 
-void receive_http_response_and_write_to_file(int sock, const char* filename) {
+int receive_http_response_and_write_to_file(int sock, const char* filename) {
+    printf("Filename is %s.\n", filename);
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+        return EXIT_FAILURE;
+    }
     FILE * p_file = fopen(filename, "w");
     if (!p_file) {
         perror("Failed to open file");
-        return;
+        return EXIT_FAILURE;
     }
 
     char buffer[BUFFER_SIZE];
@@ -67,9 +71,11 @@ void receive_http_response_and_write_to_file(int sock, const char* filename) {
     }
     if (bytesRead < 0) {
         perror("recv failed");
+        return EXIT_FAILURE;
     }
 
     fclose(p_file);
+    return EXIT_SUCCESS;
 }
 
 int scrape_web_page (const char * p_url) {
@@ -81,11 +87,15 @@ int scrape_web_page (const char * p_url) {
     size_t hash = djb_hash(p_url);
     // more than large enough for 25 characters for a 64-bit system 
     // (20 for the number, 4 for ".txt", and 1 for the null terminator).
+
     char filename[256];
-    snprintf(filename, sizeof(filename), "%zu.txt", hash);
+    snprintf(filename, sizeof(filename), "data/%zu.txt", hash);
     
     // Check if already scraped
-    // TODO: Implement
+    if (access(filename, F_OK) == 0) {
+        printf("File already exists: %s", filename);
+        return EXIT_SUCCESS;
+    }
 
     struct sockaddr_in serv_addr = {0};
     if (resolve_hostname_to_ip(hostname, &serv_addr) < 0) {

@@ -30,3 +30,16 @@ Pages scraped before can be added to the queue but no changes will take place
 
 ## Pages that we can scrape
 Not all websites allow web scraping, also we only allow HTTP (not HTTPS).
+
+## Application only works on Linux due to file path processing
+
+##
+Operates from Current working dir: /mnt/c/Users/15714/Documents/howell_17d_19_1/howell_17d_19_1/c_web_server
+meaning we can use the data dir within it
+
+## Future improvements
+Use a hashmap for files that have already been scraped instead of checking if the file exists
+if this was much bigger we would likely want to use object storage somewhere else or a volume mounted
+for multiple machines so we are able to scrape and return from multiple machines (currnently our app is stateful)
+
+Make filepaths work for for Windows and Linux

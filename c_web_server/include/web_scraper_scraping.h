@@ -2,8 +2,10 @@
 #define WEB_SCRAPER_SCRAPING_H
 
 #include <netinet/in.h> // Required for struct sockaddr_in
+#include "web_scraper_queue.h"
 
-#define PORT 80
+
+#define CLIENT_PORT 80
 #define BUFFER_SIZE 4096
 
 /**
@@ -11,7 +13,7 @@
  * 
  * @param hostname The hostname to resolve.
  * @param serv_addr A pointer to the sockaddr_in structure to populate with the server's address.
- * @return int Returns 0 on success, -1 on failure.
+ * @return int Returns EXIT_SUCCESS on success, EXIT_FAILURE on failure.
  */
 int resolve_hostname_to_ip(const char* hostname, struct sockaddr_in* serv_addr);
 
@@ -33,19 +35,30 @@ int create_and_connect_socket(const struct sockaddr_in* serv_addr);
 void send_http_get_request(int sock, const char* hostname, const char* path);
 
 /**
- * Receives the HTTP response from the server and prints it to stdout.
+ * Receives the HTTP response from the server and writes to a file.
  * 
  * @param sock The socket descriptor to use for receiving the response.
+ * @param filename The file to write to including path.
+ * @return int Returns EXIT_SUCCESS on success, EXIT_FAILURE on failure.
  */
-void receive_http_response(int sock);
+int receive_http_response_and_write_to_file(int sock, const char* filename);
 
 /**
  * High-level function to scrape a web page given its URL.
  * 
  * @param url The URL of the web page to scrape.
- * @return int Returns 0 on success, -1 on failure.
+ * @return int Returns EXIT_SUCCESS on success, EXIT_FAILURE on failure.
  */
 int scrape_web_page(const char* url);
+
+/**
+ * Handler function to be executed by threads to detect
+ * urls to be scraped from the queue and initiate scrape_web_page.
+ * 
+ * @param url The queue containing URLs.
+ * @return int Returns EXIT_SUCCESS on success, EXIT_FAILURE on failure.
+ */
+int handle_web_scrape (queue_t * p_url_queue);
 
 #endif /* WEB_SCRAPER_SCRAPING_H */
 

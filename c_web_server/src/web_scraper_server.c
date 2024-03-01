@@ -167,6 +167,7 @@ void handling_loop(int listening_socket, int max_connections, queue_t * p_url_qu
 
     const int buffer_size = 1024; // Define appropriately.
 
+    int count_run = 0;
     while (true) {
         if (poll(p_fds, max_connections, -1) == -1) {
             perror("Poll error");
@@ -179,6 +180,13 @@ void handling_loop(int listening_socket, int max_connections, queue_t * p_url_qu
         }
 
         process_existing_connections(p_fds, max_connections, buffer_size, p_url_queue);
+        if (count_run > 2)
+        {
+            printf("Breaking from the loop for testing purposes.\n");
+            break;
+        }
+        count_run++;
+        printf("Count run is %d.\n", count_run);
     }
 
     free(p_fds);
