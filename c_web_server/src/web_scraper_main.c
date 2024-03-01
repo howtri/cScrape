@@ -20,7 +20,7 @@ main ()
     }
 
     // Create URL queue.
-    queue_t * p_url_queue = queue_create();
+    queue_t *p_url_queue = queue_create();
     if (NULL == p_url_queue)
     {
         fprintf(stderr, "Failed to create queue");

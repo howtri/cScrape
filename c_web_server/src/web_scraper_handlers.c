@@ -12,32 +12,43 @@
 #include "web_scraper_utils.h"
 
 // Handle opening a file and error checking.
-static FILE* open_file(const char * p_filename) {
-    if (access(p_filename, F_OK) != 0) {
+static FILE *
+open_file (const char *p_filename)
+{
+    if (access(p_filename, F_OK) != 0)
+    {
         return NULL;
     }
 
-    FILE * p_file = fopen(p_filename, "r");
-    if (!p_file) {
+    FILE *p_file = fopen(p_filename, "r");
+    if (!p_file)
+    {
         perror("Failed to open file");
     }
     return p_file;
 }
 
-// Reads and sends all of a files contents in max transmittions of 1024 bytes in a loop.
-static int send_file_contents(int socket_fd, FILE * p_file) {
-    char buffer[1024]; // Adjust buffer size as needed
+// Reads and sends all of a files contents in max transmittions of 1024 bytes in
+// a loop.
+static int
+send_file_contents (int socket_fd, FILE *p_file)
+{
+    char    buffer[1024]; // Adjust buffer size as needed
     ssize_t bytes_read = 0;
     ssize_t bytes_sent = 0;
 
     // Continue reading until EOF.
-    while ((bytes_read = fread(buffer, 1, sizeof(buffer), p_file)) > 0) {
-        char * p_ptr = buffer;
-        while (bytes_read > 0) {
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), p_file)) > 0)
+    {
+        char *p_ptr = buffer;
+        while (bytes_read > 0)
+        {
             bytes_sent = send(socket_fd, p_ptr, bytes_read, 0);
-            if (bytes_sent < 0) {
+            if (bytes_sent < 0)
+            {
                 // Blocking condition, try again.
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                {
                     continue;
                 }
                 perror("Failed to send");
@@ -48,7 +59,8 @@ static int send_file_contents(int socket_fd, FILE * p_file) {
         }
     }
 
-    if (ferror(p_file)) {
+    if (ferror(p_file))
+    {
         perror("Failed to read from file");
         return EXIT_FAILURE;
     }
@@ -56,7 +68,8 @@ static int send_file_contents(int socket_fd, FILE * p_file) {
     return EXIT_SUCCESS;
 }
 
-int handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queue)
+int
+handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
 {
     // Validate the url.
     if ((NULL == p_url) || (NULL == p_url_queue))
@@ -66,7 +79,8 @@ int handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queu
     }
 
     // TODO: Regex
-    if (!((strncmp(p_url, "http://", 7) == 0) || (strncmp(p_url, "https://", 8) == 0)))
+    if (!((strncmp(p_url, "http://", 7) == 0)
+          || (strncmp(p_url, "https://", 8) == 0)))
     {
         printf("URL does not start with a valid scheme.\n");
         return EXIT_FAILURE;
@@ -81,22 +95,32 @@ int handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queu
 
     // Reply to the client
     char response[] = "SUCCESS: URL queued to be scraped.\n";
-    if (send(socket_fd, response, strlen(response), 0) == -1) {
-            perror("send failed");
+    if (send(socket_fd, response, strlen(response), 0) == -1)
+    {
+        perror("send failed");
     }
     return EXIT_SUCCESS;
 }
 
-int handle_return_scrape_request(int socket_fd, char * p_url) {
+int
+handle_return_scrape_request (int socket_fd, char *p_url)
+{
     char filename[256];
     util_create_filename(p_url, filename, sizeof(filename));
 
-    FILE* file = open_file(filename);
-    if (!file) {
-        printf("URL has not been scraped before, please request it be scraped %s,\n", p_url);
+    FILE *file = open_file(filename);
+    if (!file)
+    {
+        printf(
+            "URL has not been scraped before, please request it be scraped "
+            "%s,\n",
+            p_url);
         // Request still handled successfully in this case.
-        char response[] = "SUCCESS: URL has not been scraped before, please request it be scraped.\n";
-        if (send(socket_fd, response, strlen(response), 0) == -1) {
+        char response[]
+            = "SUCCESS: URL has not been scraped before, please request it be "
+              "scraped.\n";
+        if (send(socket_fd, response, strlen(response), 0) == -1)
+        {
             perror("send failed");
             return EXIT_FAILURE;
         }
@@ -104,21 +128,24 @@ int handle_return_scrape_request(int socket_fd, char * p_url) {
     int result = send_file_contents(socket_fd, file);
     fclose(file);
 
-    if (result == EXIT_FAILURE) {
+    if (result == EXIT_FAILURE)
+    {
         fprintf(stderr, "Failed to send scraped contents.\n");
-        const char* msg = "FAILURE: Failed to send scraped contents.\n";
+        const char *msg = "FAILURE: Failed to send scraped contents.\n";
         send(socket_fd, msg, strlen(msg), 0);
     }
 
     return EXIT_SUCCESS;
 }
 
-int handle_invalid_request(int socket_fd)
+int
+handle_invalid_request (int socket_fd)
 {
     char response[] = "SUCCESS: Invalid option, expected 1 or 2.\n";
-    if (send(socket_fd, response, strlen(response), 0) == -1) {
-            perror("send failed");
-            return EXIT_FAILURE;
+    if (send(socket_fd, response, strlen(response), 0) == -1)
+    {
+        perror("send failed");
+        return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
