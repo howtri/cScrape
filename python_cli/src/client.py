@@ -20,6 +20,10 @@ def connect_to_server(server_host, server_port, message):
         s.send(encoded_message)
         print("Client: Data Sent.")
 
+        # Receive response from the server
+        data = s.recv(1024)
+        print(f"Client: Server responded: {data.decode('utf-8')}")
+
 
 def main():
     """Main function."""

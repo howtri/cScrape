@@ -79,21 +79,17 @@ int receive_http_response_and_write_to_file(int sock, const char* filename) {
 }
 
 int scrape_web_page (const char * p_url) {
+    char filename[256];
+    util_create_filename(p_url, filename, sizeof(filename));
+
+    // Extract hostname and path
     char hostname[256] = {0};
     char path[512] = "/";
     sscanf(p_url, "http://%255[^/]%511[^\n]", hostname, path + 1); // +1 to skip initial '/'
-
-    // Generate filename
-    size_t hash = djb_hash(p_url);
-    // more than large enough for 25 characters for a 64-bit system 
-    // (20 for the number, 4 for ".txt", and 1 for the null terminator).
-
-    char filename[256];
-    snprintf(filename, sizeof(filename), "data/%zu.txt", hash);
     
     // Check if already scraped
     if (access(filename, F_OK) == 0) {
-        printf("File already exists: %s", filename);
+        printf("File already exists: %s,\n", filename);
         return EXIT_SUCCESS;
     }
 

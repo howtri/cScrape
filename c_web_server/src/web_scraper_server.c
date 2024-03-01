@@ -126,8 +126,8 @@ void process_existing_connections(struct pollfd p_fds[], int max_connections, in
         printf("Received message: %s\n", buffer);
 
         // Parse the message
-        char* action = strtok(buffer, " ");
-        char* url = strtok(NULL, "");
+        char * action = strtok(buffer, " ");
+        char * url = strtok(NULL, "");
 
         if ((!action) || (!url) || (strlen(action) != 1)) {
             fprintf(stderr, "Error: Incorrect message format. Expected format is <one digit number> <url>\n");
@@ -136,15 +136,16 @@ void process_existing_connections(struct pollfd p_fds[], int max_connections, in
 
         switch (action[0]) {
             case ROUTE_SCRAPE:
-                if (handle_scrape_new_request(url, p_url_queue) == EXIT_FAILURE) {
+                if (handle_scrape_new_request(p_fds[i].fd, url, p_url_queue) == EXIT_FAILURE) {
                     fprintf(stderr, "Failed to enqueue URL for scraping.\n");
                 }
                 break;
             case ROUTE_RETURN:
-                handle_return_scrape_request();
+                handle_return_scrape_request(p_fds[i].fd, url);
                 break;
             default:
-                fprintf(stderr, "Error: Unrecognized action '%c'. Expected options are 1 or 2.\n", action[0]);
+                fprintf(stderr, "Option not allowed %c.\n", action[0]);
+                handle_invalid_request(p_fds[i].fd);
                 break;
         }
     }

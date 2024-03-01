@@ -12,7 +12,7 @@ static void test_djb_hash_known_value(void ** state) {
     // WARNING: Assumed running on a 64-bit system
     size_t expected_hash = (size_t)0x8b57b087543fba60;
 
-    size_t result = djb_hash(p_input);
+    size_t result = util_djb_hash(p_input);
     assert_int_equal(result, expected_hash);
 }
 
@@ -23,7 +23,7 @@ static void test_djb_hash_empty_string(void ** state) {
     const char * p_input = "";
     size_t expected_hash = 5381; // Expected hash value for an empty string
 
-    size_t result = djb_hash(p_input);
+    size_t result = util_djb_hash(p_input);
     assert_int_equal(result, expected_hash);
 }
 
@@ -32,7 +32,7 @@ static void test_djb_hash_null_pointer(void ** state) {
     (void)state; // Unused
 
     size_t expected_hash = 0;
-    size_t result = djb_hash(NULL);
+    size_t result = util_djb_hash(NULL);
     assert_int_equal(result, expected_hash);
 }
 
