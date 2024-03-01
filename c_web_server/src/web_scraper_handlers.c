@@ -87,7 +87,7 @@ int handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queu
     return EXIT_SUCCESS;
 }
 
-int handle_return_scrape_request(int socket_fd, char* p_url) {
+int handle_return_scrape_request(int socket_fd, char * p_url) {
     char filename[256];
     util_create_filename(p_url, filename, sizeof(filename));
 

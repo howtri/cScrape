@@ -15,7 +15,7 @@ typedef struct queue {
     node_t * p_tail;
 } queue_t;
 
-node_t *
+static node_t *
 node_create (char * p_url, int url_length)
 {
     if ((NULL == p_url) || (url_length <= 0))
@@ -48,7 +48,7 @@ node_create (char * p_url, int url_length)
     return new_node;
 }
 
-void
+static void
 node_destroy (node_t ** pp_node)
 {
     if ((NULL == pp_node) || (NULL == *pp_node))

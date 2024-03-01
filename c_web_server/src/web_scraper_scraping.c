@@ -7,7 +7,10 @@
 #include "web_scraper_scraping.h"
 #include "web_scraper_utils.h"
 
-int resolve_hostname_to_ip(const char * p_hostname, struct sockaddr_in * p_serv_addr) {
+#define CLIENT_PORT 80
+#define BUFFER_SIZE 4096
+
+static int resolve_hostname_to_ip(const char * p_hostname, struct sockaddr_in * p_serv_addr) {
     struct hostent * p_host = gethostbyname(p_hostname);
     if (p_host == NULL || p_host->h_addr_list[0] == NULL) {
         perror("DNS resolution failed");
@@ -22,7 +25,7 @@ int resolve_hostname_to_ip(const char * p_hostname, struct sockaddr_in * p_serv_
     return EXIT_SUCCESS;
 }
 
-int create_and_connect_socket(const struct sockaddr_in * p_serv_addr) {
+static int create_and_connect_socket(const struct sockaddr_in * p_serv_addr) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         perror("Failed to create socket");
@@ -38,7 +41,7 @@ int create_and_connect_socket(const struct sockaddr_in * p_serv_addr) {
     return sock;
 }
 
-void send_http_get_request(int sock, const char * p_hostname, const char * p_path) {
+static void send_http_get_request(int sock, const char * p_hostname, const char * p_path) {
     char request[1024];
     snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", p_path, p_hostname);
 
@@ -48,7 +51,7 @@ void send_http_get_request(int sock, const char * p_hostname, const char * p_pat
     }
 }
 
-int receive_http_response_and_write_to_file(int sock, const char* filename) {
+static int receive_http_response_and_write_to_file(int sock, const char * filename) {
     printf("Filename is %s.\n", filename);
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
@@ -78,7 +81,7 @@ int receive_http_response_and_write_to_file(int sock, const char* filename) {
     return EXIT_SUCCESS;
 }
 
-int scrape_web_page (const char * p_url) {
+static int scrape_web_page (const char * p_url) {
     char filename[256];
     util_create_filename(p_url, filename, sizeof(filename));
 

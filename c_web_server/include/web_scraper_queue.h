@@ -1,25 +1,7 @@
 #ifndef WEB_SCRAPER_QUEUE_H
 #define WEB_SCRAPER_QUEUE_H
 
-// Forward declaration of the node and queue structures
-typedef struct node node_t;
 typedef struct queue queue_t;
-
-/**
- * @brief Creates a new node with the given URL.
- * 
- * @param p_url Pointer to the URL string.
- * @param url_length Length of the URL string.
- * @return node_t* Pointer to the created node, or NULL on failure.
- */
-node_t *node_create(char * p_url, int url_length);
-
-/**
- * @brief Frees a node and its associated resources.
- * 
- * @param pp_node Double pointer to the node to be freed.
- */
-void node_destroy(node_t ** pp_node);
 
 /**
  * @brief Creates a new queue.

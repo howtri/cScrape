@@ -1,21 +1,9 @@
-before_script:
-  # Install build essentials
-  - yum install -y git gcc make cmake
-  # Clone the cmocka source code from the official Git repository
-  - git clone https://github.com/clibs/cmocka.git
-  # Build and install cmocka
-  - mkdir cmocka/build && cd cmocka/build
-  - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
-  - make
-  - make install
-  # Go back to the previous directory
-  - cd ../../
-  - ls
-  - pwd
+# Removed before script due to the required deps between build and test varying so drastically.
 
 build:
   stage: build
   script:
+    - yum install -y gcc make
     - cd c_web_server
     - make
   artifacts:
@@ -26,6 +14,16 @@ build:
 test:
   stage: test
   script:
+    - yum install -y git gcc make cmake
+      # Clone the cmocka source code from the official Git repository
+    - git clone https://github.com/clibs/cmocka.git
+    # Build and install cmocka
+    - mkdir cmocka/build && cd cmocka/build
+    - cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release ..
+    - make
+    - make install
+    # Go back to the previous directory
+    - cd ../../
     - cd c_web_server
     - make test
     

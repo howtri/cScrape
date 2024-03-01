@@ -14,7 +14,7 @@
  * @param p_url_queue A pointer to the queue in which the URL should be enqueued.
  * @return int EXIT_SUCCESS if the URL is successfully enqueued; otherwise, EXIT_FAILURE.
  */
-int handle_scrape_new_request(int socket_fd, char *p_url, queue_t *p_url_queue);
+int handle_scrape_new_request(int socket_fd, char * p_url, queue_t * p_url_queue);
 
 /**
  * @brief Handles a request to return the content of a previously scraped page.
