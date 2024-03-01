@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
+#include "web_scraper_queue.h"
 
 #define PORT 8082
 
@@ -68,7 +69,7 @@ ssize_t receive_message(int connection_socket, char *p_buffer, size_t buffer_siz
  * @param max_connections The maximum number of connections to process.
  * @param buffer_size The size of the buffer used for receiving messages.
  */
-void process_existing_connections(struct pollfd p_fds[], int max_connections, int buffer_size);
+void process_existing_connections(struct pollfd p_fds[], int max_connections, int buffer_size, queue_t * p_url_queue);
 
 /**
  * Main loop for handling connections.
@@ -76,7 +77,7 @@ void process_existing_connections(struct pollfd p_fds[], int max_connections, in
  * @param listening_socket The listening socket's file descriptor.
  * @param max_connections The maximum number of simultaneous connections.
  */
-void handling_loop(int listening_socket, int max_connections);
+void handling_loop(int listening_socket, int max_connections, queue_t * p_url_queue);
 
 #endif /* WEB_SCRAPER_SERVER_H */
 

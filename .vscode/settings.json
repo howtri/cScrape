@@ -2,6 +2,9 @@
     "files.associations": {
         "setjmp.h": "c",
         "string.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stdlib.h": "c",
+        "web_scraper_server.h": "c",
+        "stdio.h": "c"
     }
 }

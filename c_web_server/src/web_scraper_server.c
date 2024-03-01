@@ -1,6 +1,7 @@
 // Main file for the web server web scraper.
 
 #include "web_scraper_server.h"
+#include "web_scraper_queue.h"
 
 // Create an IPv4 socket address.
 struct sockaddr_in
@@ -102,7 +103,7 @@ receive_message (int connection_socket, char * p_buffer, size_t buffer_size)
     return bytes_read;
 }
 
-void process_existing_connections(struct pollfd p_fds[], int max_connections, int buffer_size) {
+void process_existing_connections(struct pollfd p_fds[], int max_connections, int buffer_size, queue_t * p_url_queue) {
     for (int i = 1; i < max_connections; ++i) {
         if (p_fds[i].revents & POLLIN) {
             char buffer[buffer_size];
@@ -114,12 +115,17 @@ void process_existing_connections(struct pollfd p_fds[], int max_connections, in
                 // Process received data.
                 printf("Received message: %s\n", buffer);
             }
+
+            // Request to scrape a website.
+            
+            // Request to return a website thats been scraped.
+
         }
     }
 }
 
 // TODO: Exit on Signal or some other condition.
-void handling_loop(int listening_socket, int max_connections) {
+void handling_loop(int listening_socket, int max_connections, queue_t * p_url_queue) {
     struct pollfd * p_fds = malloc(max_connections * sizeof(struct pollfd));
     if (p_fds == NULL) {
         perror("Failed to allocate memory");
@@ -146,7 +152,7 @@ void handling_loop(int listening_socket, int max_connections) {
             accept_new_connections(listening_socket, p_fds, max_connections);
         }
 
-        process_existing_connections(p_fds, max_connections, buffer_size);
+        process_existing_connections(p_fds, max_connections, buffer_size, p_url_queue);
     }
 
     free(p_fds);
