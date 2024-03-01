@@ -7,6 +7,7 @@
         "web_scraper_server.h": "c",
         "stdio.h": "c",
         "web_scraper_scraping.h": "c",
-        "functional": "c"
+        "functional": "c",
+        "web_scraper_handlers.h": "c"
     }
 }

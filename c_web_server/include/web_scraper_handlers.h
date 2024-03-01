@@ -29,6 +29,7 @@ int handle_return_scrape_request(int socket_fd, char * p_url);
  * @brief Handles an invalid request.
  * 
  * @param socket_fd The client socket to respond to.
+ * @return int EXIT_SUCCESS if an error message was sent to the client; otherwise, EXIT_FAILURE.
  */
 int handle_invalid_request(int socket_fd);
 
