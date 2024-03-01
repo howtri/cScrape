@@ -2,6 +2,10 @@
 
 #include "web_scraper_server.h"
 #include "web_scraper_queue.h"
+#include "web_scraper_handlers.h"
+
+#define ROUTE_SCRAPE '1'
+#define ROUTE_RETURN '2'
 
 // Create an IPv4 socket address.
 struct sockaddr_in
@@ -83,7 +87,6 @@ void accept_new_connections(int listening_socket, struct pollfd p_fds[], int max
     }
 
     fprintf(stderr, "No available slots for new connections.\n");
-    // Close the socket if we can't handle it.
     close(new_socket);
 }
 
@@ -105,21 +108,44 @@ receive_message (int connection_socket, char * p_buffer, size_t buffer_size)
 
 void process_existing_connections(struct pollfd p_fds[], int max_connections, int buffer_size, queue_t * p_url_queue) {
     for (int i = 1; i < max_connections; ++i) {
-        if (p_fds[i].revents & POLLIN) {
-            char buffer[buffer_size];
-            ssize_t bytes_read = receive_message(p_fds[i].fd, buffer, buffer_size);
-            if (bytes_read <= 0) {
-                close(p_fds[i].fd);
-                p_fds[i].fd = -1; // Mark as available.
-            } else {
-                // Process received data.
-                printf("Received message: %s\n", buffer);
-            }
+        if (!(p_fds[i].revents & POLLIN)) {
+            continue; // Skip if no data to read
+        }
 
-            // Request to scrape a website.
-            
-            // Request to return a website thats been scraped.
+        char buffer[buffer_size];
+        memset(buffer, 0, buffer_size); // Initialize buffer to ensure it's null-terminated
+        ssize_t bytes_read = receive_message(p_fds[i].fd, buffer, buffer_size - 1);
+        
+        if (bytes_read <= 0) {
+            close(p_fds[i].fd);
+            p_fds[i].fd = -1; // Mark as available.
+            continue;
+        }
 
+        buffer[bytes_read] = '\0'; // Ensure buffer is null-terminated
+        printf("Received message: %s\n", buffer);
+
+        // Parse the message
+        char* action = strtok(buffer, " ");
+        char* url = strtok(NULL, "");
+
+        if ((!action) || (!url) || (strlen(action) != 1)) {
+            fprintf(stderr, "Error: Incorrect message format. Expected format is <one digit number> <url>\n");
+            continue; // Move to the next connection if format is incorrect
+        }
+
+        switch (action[0]) {
+            case ROUTE_SCRAPE:
+                if (handle_scrape_new_request(url, p_url_queue) == EXIT_FAILURE) {
+                    fprintf(stderr, "Failed to enqueue URL for scraping.\n");
+                }
+                break;
+            case ROUTE_RETURN:
+                handle_return_scrape_request();
+                break;
+            default:
+                fprintf(stderr, "Error: Unrecognized action '%c'. Expected options are 1 or 2.\n", action[0]);
+                break;
         }
     }
 }
