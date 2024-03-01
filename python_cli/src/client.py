@@ -20,16 +20,9 @@ def connect_to_server(server_host, server_port, message_id, message):
         # Encode the message
         encoded_message = message.encode("utf-8")
 
-        # Combine packed ID and encoded message
-        encoded_message
-
         # Send combined data to server
-        print("Client: Data Sent.")
         s.send(encoded_message)
-
-        # Receive response from the server
-        # data = s.recv(1024)
-        # return data.decode("utf-8")
+        print("Client: Data Sent.")
 
 
 def main():
@@ -37,7 +30,7 @@ def main():
     server_host = socket.gethostname()
     server_port = 8082
     message_id = 123
-    message = "TCP TCP TCP"
+    message = input("Enter the message in format <number> <url>")
 
     response = connect_to_server(server_host, server_port, message_id, message)
     print(f"Client: Server responded: {response}")
