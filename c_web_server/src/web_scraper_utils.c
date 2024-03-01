@@ -4,6 +4,10 @@
 #include "web_scraper_utils.h"
 
 size_t djb_hash(const char * p_cp) {
+    if (p_cp == NULL) {
+        return 0;
+    }
+
     size_t hash = 5381;
     while (*p_cp) {
         hash = 33 * hash ^ (unsigned char) *p_cp++;
