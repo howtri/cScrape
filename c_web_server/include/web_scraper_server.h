@@ -14,9 +14,8 @@ int start_server(int max_connections);
  * Cleans up server resources associated with the socket.
  * 
  * @param socket The socket file descriptor to clean up.
- * @return int Returns 0 on success.
  */
-int cleanup_server(int socket);
+void cleanup_server(int socket);
 
 /**
  * Main loop for handling connections.

@@ -1,4 +1,5 @@
-// Contains logic to scrape a website by sending a simple HTTP request as the client.
+// Contains logic to scrape a website by sending a simple HTTP request as the
+// client.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,23 +11,23 @@
 #include "web_scraper_scraping.h"
 #include "web_scraper_utils.h"
 
-#define CLIENT_PORT "80"
-#define BUFFER_SIZE 4096
+#define CLIENT_PORT   "80"
+#define BUFFER_SIZE   4096
 #define FILENAME_SIZE 256
-#define PATH_SIZE 512
+#define PATH_SIZE     512
 
 // Attempt to resolve a hostname to an IPv4 address using getaddrinfo.
 static int
-resolve_hostname_to_ip(const char *p_hostname, struct sockaddr_in *p_serv_addr)
+resolve_hostname_to_ip (const char *p_hostname, struct sockaddr_in *p_serv_addr)
 {
     struct addrinfo hints;
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET;
+    hints.ai_family   = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
     // We must maintain track of response head to free the structure.
     struct addrinfo *p_res_head = NULL;
-    struct addrinfo *p_res = NULL; 
+    struct addrinfo *p_res      = NULL;
 
     // getaddrinfo is thread safe.
     int status = getaddrinfo(p_hostname, CLIENT_PORT, &hints, &p_res_head);
@@ -55,8 +56,8 @@ resolve_hostname_to_ip(const char *p_hostname, struct sockaddr_in *p_serv_addr)
     return EXIT_FAILURE;
 }
 
-// Connect to the site we are scraping. Returns -1 on failure, EXIT_FAILURE may be
-// a valid socket.
+// Connect to the site we are scraping. Returns -1 on failure, EXIT_FAILURE may
+// be a valid socket.
 static int
 create_and_connect_socket (const struct sockaddr_in *p_serv_addr)
 {
@@ -79,7 +80,7 @@ create_and_connect_socket (const struct sockaddr_in *p_serv_addr)
 
 // Send the HTTP request to get the page over our TCP connection.
 static void
-send_http_get_request (int sock, const char * p_hostname, const char * p_path)
+send_http_get_request (int sock, const char *p_hostname, const char *p_path)
 {
     char request[1024];
     snprintf(request,
@@ -97,7 +98,7 @@ send_http_get_request (int sock, const char * p_hostname, const char * p_path)
 
 // Receive the response over the TCP connection and write to disk.
 static int
-receive_http_response_and_write_to_file (int sock, const char * filename)
+receive_http_response_and_write_to_file (int sock, const char *filename)
 {
     printf("Filename is %s.\n", filename);
 
@@ -128,7 +129,7 @@ receive_http_response_and_write_to_file (int sock, const char * filename)
 }
 
 int
-scrape_web_page (const char * p_url)
+scrape_web_page (const char *p_url)
 {
     if (NULL == p_url)
     {
@@ -141,7 +142,7 @@ scrape_web_page (const char * p_url)
 
     // Extract hostname and path
     char hostname[FILENAME_SIZE] = { 0 };
-    char path[PATH_SIZE]     = "/";
+    char path[PATH_SIZE]         = "/";
     // NOTE: Magic number use below. If FILENAME_SIZE or PATH_SIZE are changed
     // then the below parsing string must also reflect.
     // MUST USE: FILENAME_SIZE -1 and PATH_SIZE -1.

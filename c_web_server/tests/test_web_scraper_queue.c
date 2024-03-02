@@ -7,9 +7,12 @@
 #include <string.h>
 #include "web_scraper_queue.h"
 
-// The linker expects the mocked syscalls to be present in every function, so unfortunately here they are even if not required.
+// The linker expects the mocked syscalls to be present in every function, so
+// unfortunately here they are even if not required.
 
-ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags) {
+ssize_t
+__wrap_send (int sockfd, const void *buf, size_t len, int flags)
+{
     check_expected(sockfd);
     check_expected(buf);
     check_expected(len);

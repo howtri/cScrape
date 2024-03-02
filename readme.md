@@ -59,3 +59,5 @@ Potentially add a limit to our URL queue. There is a scenario where the URL queu
 are signaled to shutdown. In this case the application would continue processing requests for a while. Is this what we want
 
 It could also potentially get stuck on a URL and it would prevent exiting.
+
+Statistics from the threads on join. Or just more mature logging.

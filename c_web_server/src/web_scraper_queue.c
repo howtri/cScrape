@@ -145,8 +145,8 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
     return EXIT_SUCCESS;
 }
 
-// Removes a node and frees both the node and original URL. Allocates new memory for
-// the URL that must be freed by the web scraper in handle_web_scrape.
+// Removes a node and frees both the node and original URL. Allocates new memory
+// for the URL that must be freed by the web scraper in handle_web_scrape.
 char *
 queue_dequeue (queue_t *p_queue)
 {
@@ -168,7 +168,7 @@ queue_dequeue (queue_t *p_queue)
     // Duplicate URL, web_scraper_handler will free.
     char  *removed_node_url = removed_node->url;
     size_t len              = strlen(removed_node_url);
-    char  *p_url              = calloc(1, len + 1); // +1 for the null terminator
+    char  *p_url            = calloc(1, len + 1); // +1 for the null terminator
     if (NULL == p_url)
     {
         perror("Failed to allocate memory");

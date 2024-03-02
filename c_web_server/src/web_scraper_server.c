@@ -1,4 +1,5 @@
-// Contains logic for starting the web server and accepting connections using poll.
+// Contains logic for starting the web server and accepting connections using
+// poll.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,7 +15,7 @@
 #include "web_scraper_handlers.h"
 
 #define PORT         8082
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE  1024
 #define ROUTE_SCRAPE '1'
 #define ROUTE_RETURN '2'
 
@@ -23,7 +24,9 @@
 volatile sig_atomic_t shutdown_requested = 0;
 
 // Modify the sigint_handler to set this flag
-void sigint_handler(int sig_num) {
+void
+sigint_handler (int sig_num)
+{
     shutdown_requested = 1;
 }
 
@@ -31,7 +34,7 @@ void sigint_handler(int sig_num) {
 static struct sockaddr_in
 initialize_server_address ()
 {
-    // Create a IPV4 address that can accept any IP addresses as connections.
+    // Create an IPV4 address that can accept any IP addresses as connections.
     struct sockaddr_in address = { 0 };
     address.sin_family         = AF_INET;
     address.sin_addr.s_addr    = INADDR_ANY;
@@ -134,10 +137,10 @@ receive_message (int connection_socket, char *p_buffer, size_t buffer_size)
 }
 
 static void
-process_existing_connections(struct pollfd p_fds[],
-                             int           max_connections,
-                             int           buffer_size,
-                             queue_t      *p_url_queue)
+process_existing_connections (struct pollfd p_fds[],
+                              int           max_connections,
+                              int           buffer_size,
+                              queue_t      *p_url_queue)
 {
     for (int i = 1; i < max_connections; ++i)
     {
@@ -147,8 +150,11 @@ process_existing_connections(struct pollfd p_fds[],
         }
 
         char buffer[buffer_size];
-        memset(buffer, 0, buffer_size); // Initialize buffer to ensure its null-terminated
-        ssize_t bytes_read = receive_message(p_fds[i].fd, buffer, buffer_size - 1);
+        memset(buffer,
+               0,
+               buffer_size); // Initialize buffer to ensure its null-terminated
+        ssize_t bytes_read
+            = receive_message(p_fds[i].fd, buffer, buffer_size - 1);
 
         if (bytes_read <= 0)
         {
@@ -166,8 +172,11 @@ process_existing_connections(struct pollfd p_fds[],
 
         if ((!action) || (!url) || (strlen(action) != 1))
         {
-            fprintf(stderr, "Error: Incorrect message format. Expected format is <one digit number> <url>\n");
-            continue; // Move to the next connection if format is incorrect
+            fprintf(stderr,
+                    "Incorrect message format. Expected format is <one digit "
+                    "number> <url>\n");
+            handle_invalid_request(p_fds[i].fd);
+            continue;
         }
 
         char safe_url[BUFFER_SIZE];
@@ -177,7 +186,9 @@ process_existing_connections(struct pollfd p_fds[],
         switch (action[0])
         {
             case ROUTE_SCRAPE:
-                if (handle_scrape_new_request(p_fds[i].fd, safe_url, p_url_queue) == EXIT_FAILURE)
+                if (handle_scrape_new_request(
+                        p_fds[i].fd, safe_url, p_url_queue)
+                    == EXIT_FAILURE)
                 {
                     fprintf(stderr, "Failed to enqueue URL for scraping.\n");
                 }
@@ -193,33 +204,35 @@ process_existing_connections(struct pollfd p_fds[],
     }
 }
 
-// Continue accepting new connections from clients (up to the connection limit) and
-// process already established connections in a loop utilizing poll. Existing
-// connections are processed and completed using one of the three web scraper handlers.
-// Web scraper handlers can pass tasks to the thread pool for asynchronous completion
-// for web scraping.
-// Web server begins shutting down on SIGINT.
+// Continue accepting new connections from clients (up to the connection limit)
+// and process already established connections in a loop utilizing poll.
+// Existing connections are processed and completed using one of the three web
+// scraper handlers. Web scraper handlers can pass tasks to the thread pool for
+// asynchronous completion for web scraping. Web server begins shutting down on
+// SIGINT.
 void
 handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 {
-    struct sigaction sa; // Declare a sigaction structure to set up the signal handler
-    memset(&sa, 0, sizeof(sa)); // Clear the structure
-    sa.sa_handler = sigint_handler; // Specify the handler function
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = sigint_handler;
     sigemptyset(&sa.sa_mask); // Initialize the signal set to empty
-    sa.sa_flags = 0; // No flags
+    sa.sa_flags = 0;          // No flags
 
     // Register the signal handler for SIGINT
-    if (sigaction(SIGINT, &sa, NULL) == -1) {
+    if (sigaction(SIGINT, &sa, NULL) == -1)
+    {
         perror("Error setting up signal handler");
         exit(EXIT_FAILURE);
     }
-    
+
     struct pollfd *p_fds = calloc(max_connections, sizeof(struct pollfd));
     if (p_fds == NULL)
     {
         perror("Failed to allocate memory");
         return;
     }
+
     // Initialize all to -1. On some platforms fd can be larger than a byte so
     // its safest to loop over and set to -1.
     for (int fd_iter = 0; fd_iter < max_connections; fd_iter++)
@@ -234,16 +247,22 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
     while (!shutdown_requested)
     {
         int poll_result = poll(p_fds, max_connections, -1);
-        if (poll_result == -1) {
-            if (errno == EINTR) {
+        if (poll_result == -1)
+        {
+            if (errno == EINTR)
+            {
                 // Handling of interrupted system call.
-                // Check if shutdown is requested, then break or continue based on your logic.
+                // Check if shutdown is requested or was interrupted some other
+                // way not registered by the handler.
                 printf("Poll interrupted by signal.\n");
-                if (shutdown_requested) {
-                    break; // Exit the loop for graceful shutdown
+                if (shutdown_requested)
+                {
+                    break; // Exit the loop for graceful shutdown.
                 }
-                continue; // Optionally, continue polling if not shutting down
-            } else {
+                continue; // Continue polling if not set to shutdown.
+            }
+            else
+            {
                 perror("Poll error");
                 free(p_fds);
                 return;
@@ -263,11 +282,10 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
     free(p_fds);
 }
 
-int
+void
 cleanup_server (int socket)
 {
     close(socket);
-    return 0;
 }
 
 // end of file.

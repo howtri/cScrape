@@ -33,8 +33,8 @@ open_file (const char *p_filename)
     return p_file;
 }
 
-// Reads and sends all of a files contents in max transmitions of MESSAGE_SIZE bytes in
-// a loop.
+// Reads and sends all of a files contents in max transmitions of MESSAGE_SIZE
+// bytes in a loop.
 static int
 send_file_contents (int socket_fd, FILE *p_file)
 {
@@ -73,9 +73,10 @@ send_file_contents (int socket_fd, FILE *p_file)
     return EXIT_SUCCESS;
 }
 
-// Accepts client requests that contain a URL and adds to the queue to be scraped asynchronously.
-// Uses the global queue mutex to ensure that URLs are not enqueued or dequeued while we are
-// enqueuing. Then prompts the worker threads to begin scraping by adding a task to the thread pool.
+// Accepts client requests that contain a URL and adds to the queue to be
+// scraped asynchronously. Uses the global queue mutex to ensure that URLs are
+// not enqueued or dequeued while we are enqueuing. Then prompts the worker
+// threads to begin scraping by adding a task to the thread pool.
 int
 handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
 {
@@ -92,8 +93,9 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
         printf("URL does not start with a valid scheme.\n");
         return EXIT_FAILURE;
     }
-    
-    // Critical Path: Prevent the queue from being accessed by multiple threads at the same time.
+
+    // Critical Path: Prevent the queue from being accessed by multiple threads
+    // at the same time.
     pthread_mutex_lock(&global_queue_mutex);
 
     // Enqueue valid url
@@ -105,8 +107,11 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
 
     pthread_mutex_unlock(&global_queue_mutex);
 
-    // Signal the worker threads that there is a URL to scrape by adding to the pool tasks.
-    if (thread_pool_add_task(&global_thread_pool, scrape_url_task, (void *)p_url_queue) == EXIT_FAILURE)
+    // Signal the worker threads that there is a URL to scrape by adding to the
+    // pool tasks.
+    if (thread_pool_add_task(
+            &global_thread_pool, scrape_url_task, (void *)p_url_queue)
+        == EXIT_FAILURE)
     {
         fprintf(stderr, "Failed to add the thread task.\n");
         return EXIT_FAILURE;
@@ -121,6 +126,9 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
     return EXIT_SUCCESS;
 }
 
+// Hashes a URL to determine the file name and verifies if the file exists. If
+// the file exists the contents are read and transmitted to the client in a
+// loop.
 int
 handle_return_scrape_request (int socket_fd, char *p_url)
 {
@@ -159,10 +167,12 @@ handle_return_scrape_request (int socket_fd, char *p_url)
     return EXIT_SUCCESS;
 }
 
+// Responds to the client for invalid options.
 int
 handle_invalid_request (int socket_fd)
 {
-    char response[] = "SUCCESS: Invalid option, expected 1 or 2.\n";
+    char response[]
+        = "SUCCESS: Invalid option or message, expected <1 or 2> <url>.\n";
     if (send(socket_fd, response, strlen(response), 0) == -1)
     {
         perror("send failed");
