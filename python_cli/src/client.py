@@ -1,9 +1,23 @@
+"""Web Scraper Client
+
+This file interacts with the c_web_server files. It sends tcp requests based on
+CLI arguments from the user.
+
+WARNING: Not all sites permit web scraping. Please ensure the site you pass to the
+web scraper as an argument permits web scrapers to scrape its content.
+
+Usage:
+
+    $ python3 client.py <1/2> <http://<url>.com>
+"""
+
 import socket
 import sys
 
+
 def receive_full_message(sock, buffer_size=1024):
     """Receive a full message in chunks until no more data is available"""
-    message = b''
+    message = b""
     while True:
         chunk = sock.recv(buffer_size)
         message += chunk
@@ -11,6 +25,7 @@ def receive_full_message(sock, buffer_size=1024):
             # There is no more data being sent based on a full buffer not being sent.
             break
     return message
+
 
 def connect_to_server(server_host, server_port, message):
     """Connects to the server and sends a message.
@@ -41,7 +56,6 @@ def main():
         print("Usage: python3 cli.py <message_part1> <message_part2>")
         sys.exit(1)
 
-    # Combine the arguments into a single message string
     message_part1 = sys.argv[1]
     message_part2 = sys.argv[2]
     message = f"{message_part1} {message_part2}"
@@ -50,6 +64,7 @@ def main():
     server_port = 8082
 
     connect_to_server(server_host, server_port, message)
+
 
 if __name__ == "__main__":
     main()
