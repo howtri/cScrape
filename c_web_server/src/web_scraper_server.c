@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
+#include <errno.h>
 #include "web_scraper_server.h"
 #include "web_scraper_handlers.h"
 
@@ -15,6 +17,15 @@
 #define BUFFER_SIZE 1024
 #define ROUTE_SCRAPE '1'
 #define ROUTE_RETURN '2'
+
+// Use to determine when the server should begin shutting down.
+// Any URLs still being processed by threads will continue.
+volatile sig_atomic_t shutdown_requested = 0;
+
+// Modify the sigint_handler to set this flag
+void sigint_handler(int sig_num) {
+    shutdown_requested = 1;
+}
 
 // Create an IPv4 socket address.
 static struct sockaddr_in
@@ -112,7 +123,6 @@ receive_message (int connection_socket, char *p_buffer, size_t buffer_size)
 {
     // Retain space for a null-byte terminator.
     ssize_t bytes_read = read(connection_socket, p_buffer, buffer_size - 1);
-    printf("Bytes read %ld.\n", bytes_read);
     if (-1 == bytes_read)
     {
         perror("Failed to read from socket");
@@ -183,10 +193,27 @@ process_existing_connections(struct pollfd p_fds[],
     }
 }
 
-// TODO: Exit on Signal or some other condition.
+// Continue accepting new connections from clients (up to the connection limit) and
+// process already established connections in a loop utilizing poll. Existing
+// connections are processed and completed using one of the three web scraper handlers.
+// Web scraper handlers can pass tasks to the thread pool for asynchronous completion
+// for web scraping.
+// Web server begins shutting down on SIGINT.
 void
 handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 {
+    struct sigaction sa; // Declare a sigaction structure to set up the signal handler
+    memset(&sa, 0, sizeof(sa)); // Clear the structure
+    sa.sa_handler = sigint_handler; // Specify the handler function
+    sigemptyset(&sa.sa_mask); // Initialize the signal set to empty
+    sa.sa_flags = 0; // No flags
+
+    // Register the signal handler for SIGINT
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("Error setting up signal handler");
+        exit(EXIT_FAILURE);
+    }
+    
     struct pollfd *p_fds = calloc(max_connections, sizeof(struct pollfd));
     if (p_fds == NULL)
     {
@@ -204,14 +231,23 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 
     const int buffer_size = BUFFER_SIZE;
 
-    int count_run = 0;
-    while (true)
+    while (!shutdown_requested)
     {
-        if (poll(p_fds, max_connections, -1) == -1)
-        {
-            perror("Poll error");
-            free(p_fds);
-            return;
+        int poll_result = poll(p_fds, max_connections, -1);
+        if (poll_result == -1) {
+            if (errno == EINTR) {
+                // Handling of interrupted system call.
+                // Check if shutdown is requested, then break or continue based on your logic.
+                printf("Poll interrupted by signal.\n");
+                if (shutdown_requested) {
+                    break; // Exit the loop for graceful shutdown
+                }
+                continue; // Optionally, continue polling if not shutting down
+            } else {
+                perror("Poll error");
+                free(p_fds);
+                return;
+            }
         }
 
         if (p_fds[0].revents & POLLIN)
@@ -221,15 +257,9 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 
         process_existing_connections(
             p_fds, max_connections, buffer_size, p_url_queue);
-        if (count_run > 15)
-        {
-            printf("Breaking from the loop for testing purposes.\n");
-            break;
-        }
-        count_run++;
-        printf("Count run is %d.\n", count_run);
     }
 
+    printf("INFO: Starting Server Shutdown.\n");
     free(p_fds);
 }
 

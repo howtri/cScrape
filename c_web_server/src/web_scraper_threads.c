@@ -36,7 +36,6 @@ static void *worker_thread(void *arg) {
         pool->task_count--;
         pthread_mutex_unlock(&pool->lock);
 
-        printf("Running from a thread.\n");
         task.func(task.arg);
     }
 
@@ -87,7 +86,6 @@ int thread_pool_add_task(thread_pool_t *p_pool, task_function func, void *p_arg)
     }
 
     p_pool->tasks[p_pool->task_count++] = (task_t){ .func = func, .arg = p_arg };
-    printf("Added to the pool tasks!.\n");
     pthread_cond_signal(&p_pool->cond);
     pthread_mutex_unlock(&p_pool->lock);
 

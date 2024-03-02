@@ -49,3 +49,13 @@ File names of a max 255 are allowed and a max of 511 for path size
 Security Considerations: Path traversal etc.
 
 Regex for URL parsing.
+
+Potential risk of the same URL being submitted at the same time and scraping twice
+
+Adding more tasks to be accomplished by worker threads. This would neccesitate locking the thread pool as well
+so multiple tasks arent added at the same time. Currently only the primary thread adds/removed thread pool tasks.
+
+Potentially add a limit to our URL queue. There is a scenario where the URL queue is flooded with requests and we
+are signaled to shutdown. In this case the application would continue processing requests for a while. Is this what we want
+
+It could also potentially get stuck on a URL and it would prevent exiting.

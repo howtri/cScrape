@@ -150,9 +150,16 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
 char *
 queue_dequeue (queue_t *p_queue)
 {
-    if (NULL == p_queue || NULL == p_queue->p_head)
+    if (NULL == p_queue)
     {
-        fprintf(stderr, "Queue is empty or invalid pointer argument\n");
+        fprintf(stderr, "ERROR: Invalid pointer argument\n");
+        return NULL;
+    }
+
+    // The queue being empty is an expected case. The worker threads
+    // run until the queue is empty.
+    if (NULL == p_queue->p_head)
+    {
         return NULL;
     }
 

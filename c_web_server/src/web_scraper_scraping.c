@@ -34,7 +34,7 @@ resolve_hostname_to_ip(const char *p_hostname, struct sockaddr_in *p_serv_addr)
     {
         // gai_strerror() function translates these error codes to a
         // human readable string, suitable for error reporting.
-        fprintf(stderr, "DNS resolution failed: %s\n", gai_strerror(status));
+        fprintf(stderr, "DNS resolution failed2: %s\n", gai_strerror(status));
         return EXIT_FAILURE;
     }
 
@@ -55,7 +55,8 @@ resolve_hostname_to_ip(const char *p_hostname, struct sockaddr_in *p_serv_addr)
     return EXIT_FAILURE;
 }
 
-// Connect to the site we are scraping.
+// Connect to the site we are scraping. Returns -1 on failure, EXIT_FAILURE may be
+// a valid socket.
 static int
 create_and_connect_socket (const struct sockaddr_in *p_serv_addr)
 {
@@ -152,16 +153,17 @@ scrape_web_page (const char * p_url)
     // Check if already scraped
     if (access(filename, F_OK) == 0)
     {
-        printf("File already exists: %s,\n", filename);
+        printf("INFO: File already exists: %s,\n", filename);
         return EXIT_SUCCESS;
     }
 
     struct sockaddr_in serv_addr = { 0 };
-    if (resolve_hostname_to_ip(hostname, &serv_addr) < 0)
+    if (resolve_hostname_to_ip(hostname, &serv_addr) == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
 
+    // Returns -1 on failure, EXIT_FAILURE could be a valid socket.
     int sock = create_and_connect_socket(&serv_addr);
     if (sock < 0)
     {
