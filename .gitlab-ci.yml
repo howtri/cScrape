@@ -7,8 +7,6 @@ build:
     - cd c_web_server
     - mkdir bin
     - make
-    - ls
-    - ls/bin
   artifacts:
     paths:
       - c_web_server/bin/
@@ -28,5 +26,6 @@ test:
     # Go back to the previous directory
     - cd ../../
     - cd c_web_server
+    - mkdir bin
     - make test
     
