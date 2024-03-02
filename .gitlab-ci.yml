@@ -26,6 +26,5 @@ test:
     # Go back to the previous directory
     - cd ../../
     - cd c_web_server
-    - mkdir bin
     - make test
     
