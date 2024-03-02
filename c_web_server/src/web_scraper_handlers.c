@@ -11,6 +11,8 @@
 #include "web_scraper_handlers.h"
 #include "web_scraper_utils.h"
 
+#define MESSAGE_SIZE 1024
+
 // Handle opening a file and error checking.
 static FILE *
 open_file (const char *p_filename)
@@ -24,16 +26,17 @@ open_file (const char *p_filename)
     if (!p_file)
     {
         perror("Failed to open file");
+        return NULL;
     }
     return p_file;
 }
 
-// Reads and sends all of a files contents in max transmittions of 1024 bytes in
+// Reads and sends all of a files contents in max transmitions of MESSAGE_SIZE bytes in
 // a loop.
 static int
 send_file_contents (int socket_fd, FILE *p_file)
 {
-    char    buffer[1024]; // Adjust buffer size as needed
+    char    buffer[MESSAGE_SIZE]; // Adjust buffer size as needed
     ssize_t bytes_read = 0;
     ssize_t bytes_sent = 0;
 

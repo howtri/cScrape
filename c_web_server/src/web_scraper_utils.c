@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "web_scraper_utils.h"
 
+// Simple djb hash implementation for fast non cryptographical hashing
+// https://codereview.stackexchange.com/questions/85556/simple-string-hashing-algorithm-implementation
 static size_t
 util_djb_hash (const char *p_cp)
 {
@@ -33,7 +35,7 @@ util_create_filename (const char *p_url,
         return EXIT_FAILURE;
     }
 
-    // Use buffer_size for snprintf
+    // Formats specifically for a Linux based file system.
     snprintf(p_filename_buffer, buffer_size, "data/%zu.txt", hash);
 
     return EXIT_SUCCESS;

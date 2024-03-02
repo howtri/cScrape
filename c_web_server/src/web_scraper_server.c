@@ -1,4 +1,4 @@
-// Main file for the web server web scraper.
+// Contains logic for starting the web server and accepting connections using poll.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include "web_scraper_handlers.h"
 
 #define PORT         8082
+#define BUFFER_SIZE 1024
 #define ROUTE_SCRAPE '1'
 #define ROUTE_RETURN '2'
 
@@ -123,10 +124,10 @@ receive_message (int connection_socket, char *p_buffer, size_t buffer_size)
 }
 
 static void
-process_existing_connections (struct pollfd p_fds[],
-                              int           max_connections,
-                              int           buffer_size,
-                              queue_t      *p_url_queue)
+process_existing_connections(struct pollfd p_fds[],
+                             int           max_connections,
+                             int           buffer_size,
+                             queue_t      *p_url_queue)
 {
     for (int i = 1; i < max_connections; ++i)
     {
@@ -136,11 +137,8 @@ process_existing_connections (struct pollfd p_fds[],
         }
 
         char buffer[buffer_size];
-        memset(buffer,
-               0,
-               buffer_size); // Initialize buffer to ensure it's null-terminated
-        ssize_t bytes_read
-            = receive_message(p_fds[i].fd, buffer, buffer_size - 1);
+        memset(buffer, 0, buffer_size); // Initialize buffer to ensure its null-terminated
+        ssize_t bytes_read = receive_message(p_fds[i].fd, buffer, buffer_size - 1);
 
         if (bytes_read <= 0)
         {
@@ -149,32 +147,33 @@ process_existing_connections (struct pollfd p_fds[],
             continue;
         }
 
-        buffer[bytes_read] = '\0'; // Ensure buffer is null-terminated
-        printf("Received message: %s\n", buffer);
+        buffer[bytes_read] = '\0';
 
-        // Parse the message
-        char *action = strtok(buffer, " ");
-        char *url    = strtok(NULL, "");
+        // Use strtok_r for thread-safe tokenization.
+        char *saveptr;
+        char *action = strtok_r(buffer, " ", &saveptr);
+        char *url    = strtok_r(NULL, "", &saveptr);
 
         if ((!action) || (!url) || (strlen(action) != 1))
         {
-            fprintf(stderr,
-                    "Error: Incorrect message format. Expected format is <one "
-                    "digit number> <url>\n");
+            fprintf(stderr, "Error: Incorrect message format. Expected format is <one digit number> <url>\n");
             continue; // Move to the next connection if format is incorrect
         }
+
+        char safe_url[BUFFER_SIZE];
+        strncpy(safe_url, url, buffer_size - 1);
+        safe_url[buffer_size - 1] = '\0'; // Ensure null termination
 
         switch (action[0])
         {
             case ROUTE_SCRAPE:
-                if (handle_scrape_new_request(p_fds[i].fd, url, p_url_queue)
-                    == EXIT_FAILURE)
+                if (handle_scrape_new_request(p_fds[i].fd, safe_url, p_url_queue) == EXIT_FAILURE)
                 {
                     fprintf(stderr, "Failed to enqueue URL for scraping.\n");
                 }
                 break;
             case ROUTE_RETURN:
-                handle_return_scrape_request(p_fds[i].fd, url);
+                handle_return_scrape_request(p_fds[i].fd, safe_url);
                 break;
             default:
                 fprintf(stderr, "Option not allowed %c.\n", action[0]);
@@ -188,7 +187,7 @@ process_existing_connections (struct pollfd p_fds[],
 void
 handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 {
-    struct pollfd *p_fds = malloc(max_connections * sizeof(struct pollfd));
+    struct pollfd *p_fds = calloc(max_connections, sizeof(struct pollfd));
     if (p_fds == NULL)
     {
         perror("Failed to allocate memory");
@@ -203,7 +202,7 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
     p_fds[0].fd     = listening_socket;
     p_fds[0].events = POLLIN;
 
-    const int buffer_size = 1024; // Define appropriately.
+    const int buffer_size = BUFFER_SIZE;
 
     int count_run = 0;
     while (true)

@@ -4,7 +4,8 @@
 CC = gcc
 
 # Compiler flags
-CFLAGS = -std=c17 -g -Wall -I$(INCDIR)
+# POSIX source needed to be defined for strtok_r
+CFLAGS = -std=c17 -D_POSIX_C_SOURCE=200809L -g -Wall -I$(INCDIR)
 
 # Flags for linking CMocka
 LDFLAGS = -lcmocka

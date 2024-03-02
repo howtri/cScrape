@@ -17,6 +17,8 @@ typedef struct queue
     node_t *p_tail;
 } queue_t;
 
+// Create a node that contains a URL. Dynamic memory is used for both the node
+// and the URL it contains. Node_destroy is responsible for freeing both.
 static node_t *
 node_create (char *p_url, int url_length)
 {
@@ -50,6 +52,8 @@ node_create (char *p_url, int url_length)
     return new_node;
 }
 
+// Frees a node and its contained url.
+// The URL is freed here in the case that queue destroy is called.
 static void
 node_destroy (node_t **pp_node)
 {
@@ -69,6 +73,8 @@ node_destroy (node_t **pp_node)
     *pp_node = NULL;
 }
 
+// Creates a queue datastructure, the dynamic memory allocated is
+// expected to be freed in queue_destroy.
 queue_t *
 queue_create ()
 {
@@ -82,13 +88,15 @@ queue_create ()
     return new_queue;
 }
 
-void
+// Makes calls to free every node contained in a queue and frees
+// the queue data structure.
+int
 queue_destroy (queue_t **pp_queue)
 {
     if ((NULL == pp_queue) || (NULL == *pp_queue))
     {
         fprintf(stderr, "Invalid pointer argument");
-        return;
+        return EXIT_FAILURE;
     }
 
     // Free all nodes in the queue
@@ -101,8 +109,10 @@ queue_destroy (queue_t **pp_queue)
 
     free(*pp_queue);
     *pp_queue = NULL;
+    return EXIT_SUCCESS;
 }
 
+// Creates a node for a URL and adds the node to the end (tail) of the queue.
 int
 queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
 {
@@ -120,7 +130,6 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
         return EXIT_FAILURE;
     }
 
-    // Add the new node to the queue using logic similar to before.
     if (NULL == p_queue->p_head)
     {
         p_queue->p_head = new_node;
@@ -135,6 +144,8 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
     return EXIT_SUCCESS;
 }
 
+// Removes a node and frees both the node and original URL. Allocates new memory for
+// the URL that must be freed by the web scraper in handle_web_scrape.
 char *
 queue_dequeue (queue_t *p_queue)
 {
@@ -149,8 +160,13 @@ queue_dequeue (queue_t *p_queue)
     // Duplicate URL, web_scraper_handler will free.
     char  *removed_node_url = removed_node->url;
     size_t len              = strlen(removed_node_url);
-    char  *url              = calloc(1, len + 1); // +1 for the null terminator
-    strcpy(url, removed_node_url);
+    char  *p_url              = calloc(1, len + 1); // +1 for the null terminator
+    if (NULL == p_url)
+    {
+        perror("Failed to allocate memory");
+        return NULL;
+    }
+    strcpy(p_url, removed_node_url);
 
     // Advance the head pointer.
     p_queue->p_head = p_queue->p_head->p_next;
@@ -162,5 +178,5 @@ queue_dequeue (queue_t *p_queue)
     // Free the removed node.
     node_destroy(&removed_node);
 
-    return url; // Return the duplicated URL.
+    return p_url; // Return the duplicated URL.
 }

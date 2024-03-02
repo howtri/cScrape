@@ -43,3 +43,7 @@ if this was much bigger we would likely want to use object storage somewhere els
 for multiple machines so we are able to scrape and return from multiple machines (currnently our app is stateful)
 
 Make filepaths work for for Windows and Linux
+
+File names of a max 255 are allowed and a max of 511 for path size
+
+Security Considerations: Path traversal etc.

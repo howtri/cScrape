@@ -14,8 +14,9 @@ queue_t *queue_create(void);
  * @brief Frees a queue and all its nodes.
  * 
  * @param pp_queue Double pointer to the queue to be freed.
+ * @return int EXIT_SUCCESS on success, or EXIT_FAILURE on failure.
  */
-void queue_destroy(queue_t ** pp_queue);
+int queue_destroy(queue_t ** pp_queue);
 
 /**
  * @brief Enqueues a URL into the queue.
