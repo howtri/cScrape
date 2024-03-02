@@ -61,3 +61,5 @@ are signaled to shutdown. In this case the application would continue processing
 It could also potentially get stuck on a URL and it would prevent exiting.
 
 Statistics from the threads on join. Or just more mature logging.
+
+Network comm could be more robust. There are some cases when the full buffer is not sent but more data is being sent.

@@ -7,20 +7,20 @@
 
 typedef struct node
 {
-    struct node *p_next;
-    char        *url;
+    struct node * p_next;
+    char        * url;
 } node_t;
 
 typedef struct queue
 {
-    node_t *p_head;
-    node_t *p_tail;
+    node_t * p_head;
+    node_t * p_tail;
 } queue_t;
 
 // Create a node that contains a URL. Dynamic memory is used for both the node
 // and the URL it contains. Node_destroy is responsible for freeing both.
 static node_t *
-node_create (char *p_url, int url_length)
+node_create (char * p_url, int url_length)
 {
     if ((NULL == p_url) || (url_length <= 0))
     {
@@ -29,7 +29,7 @@ node_create (char *p_url, int url_length)
     }
 
     // node_destroy is responsible for freeing this memory.
-    node_t *new_node = calloc(1, sizeof(node_t));
+    node_t * new_node = calloc(1, sizeof(node_t));
     if (NULL == new_node)
     {
         perror("Failed to allocate memory");
@@ -38,7 +38,7 @@ node_create (char *p_url, int url_length)
 
     // Handle dynamic memory for the URL to own its memory for the lifecycle
     // of the program. node_destroy is responsible for freeing it.
-    char *url_mem = calloc(1, url_length + 1);
+    char * url_mem = calloc(1, url_length + 1);
     if (NULL == url_mem)
     {
         perror("Failed to allocate memory");
@@ -56,7 +56,7 @@ node_create (char *p_url, int url_length)
 // Frees a node and its contained url.
 // The URL is freed here in the case that queue destroy is called.
 static void
-node_destroy (node_t **pp_node)
+node_destroy (node_t ** pp_node)
 {
     if ((NULL == pp_node) || (NULL == *pp_node))
     {
@@ -92,7 +92,7 @@ queue_create ()
 // Makes calls to free every node contained in a queue and frees
 // the queue data structure.
 int
-queue_destroy (queue_t **pp_queue)
+queue_destroy (queue_t ** pp_queue)
 {
     if ((NULL == pp_queue) || (NULL == *pp_queue))
     {
@@ -115,7 +115,7 @@ queue_destroy (queue_t **pp_queue)
 
 // Creates a node for a URL and adds the node to the end (tail) of the queue.
 int
-queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
+queue_enqueue (queue_t * p_queue, char * p_url, int url_length)
 {
     if (NULL == p_queue || NULL == p_url || url_length <= 0)
     {
@@ -124,7 +124,7 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
     }
 
     // Create a new node with the provided URL.
-    node_t *new_node = node_create(p_url, url_length);
+    node_t * new_node = node_create(p_url, url_length);
     if (NULL == new_node)
     {
         fprintf(stderr, "Failed to create a new node\n");
@@ -148,7 +148,7 @@ queue_enqueue (queue_t *p_queue, char *p_url, int url_length)
 // Removes a node and frees both the node and original URL. Allocates new memory
 // for the URL that must be freed by the web scraper in handle_web_scrape.
 char *
-queue_dequeue (queue_t *p_queue)
+queue_dequeue (queue_t * p_queue)
 {
     if (NULL == p_queue)
     {
@@ -164,11 +164,11 @@ queue_dequeue (queue_t *p_queue)
     }
 
     // Remove the head node from the queue.
-    node_t *removed_node = p_queue->p_head;
+    node_t * removed_node = p_queue->p_head;
     // Duplicate URL, web_scraper_handler will free.
-    char  *removed_node_url = removed_node->url;
+    char  * removed_node_url = removed_node->url;
     size_t len              = strlen(removed_node_url);
-    char  *p_url            = calloc(1, len + 1); // +1 for the null terminator
+    char  * p_url            = calloc(1, len + 1); // +1 for the null terminator
     if (NULL == p_url)
     {
         perror("Failed to allocate memory");

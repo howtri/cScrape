@@ -122,7 +122,7 @@ accept_new_connections (int           listening_socket,
 }
 
 static ssize_t
-receive_message (int connection_socket, char *p_buffer, size_t buffer_size)
+receive_message (int connection_socket, char * p_buffer, size_t buffer_size)
 {
     // Retain space for a null-byte terminator.
     ssize_t bytes_read = read(connection_socket, p_buffer, buffer_size - 1);
@@ -211,7 +211,7 @@ process_existing_connections (struct pollfd p_fds[],
 // asynchronous completion for web scraping. Web server begins shutting down on
 // SIGINT.
 void
-handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
+handling_loop (int listening_socket, int max_connections, queue_t * p_url_queue)
 {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));

@@ -17,14 +17,14 @@
 
 // Handle opening a file and error checking.
 static FILE *
-open_file (const char *p_filename)
+open_file (const char * p_filename)
 {
     if (access(p_filename, F_OK) != 0)
     {
         return NULL;
     }
 
-    FILE *p_file = fopen(p_filename, "r");
+    FILE * p_file = fopen(p_filename, "r");
     if (!p_file)
     {
         perror("Failed to open file");
@@ -36,7 +36,7 @@ open_file (const char *p_filename)
 // Reads and sends all of a files contents in max transmitions of MESSAGE_SIZE
 // bytes in a loop.
 static int
-send_file_contents (int socket_fd, FILE *p_file)
+send_file_contents (int socket_fd, FILE * p_file)
 {
     char    buffer[MESSAGE_SIZE]; // Adjust buffer size as needed
     ssize_t bytes_read = 0;
@@ -45,7 +45,7 @@ send_file_contents (int socket_fd, FILE *p_file)
     // Continue reading until EOF.
     while ((bytes_read = fread(buffer, 1, sizeof(buffer), p_file)) > 0)
     {
-        char *p_ptr = buffer;
+        char * p_ptr = buffer;
         while (bytes_read > 0)
         {
             bytes_sent = send(socket_fd, p_ptr, bytes_read, 0);
@@ -78,7 +78,7 @@ send_file_contents (int socket_fd, FILE *p_file)
 // not enqueued or dequeued while we are enqueuing. Then prompts the worker
 // threads to begin scraping by adding a task to the thread pool.
 int
-handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
+handle_scrape_new_request (int socket_fd, char * p_url, queue_t *p_url_queue)
 {
     // Validate the url.
     if ((NULL == p_url) || (NULL == p_url_queue))
@@ -130,12 +130,12 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
 // the file exists the contents are read and transmitted to the client in a
 // loop.
 int
-handle_return_scrape_request (int socket_fd, char *p_url)
+handle_return_scrape_request (int socket_fd, char * p_url)
 {
     char filename[256];
     util_create_filename(p_url, filename, sizeof(filename));
 
-    FILE *file = open_file(filename);
+    FILE * file = open_file(filename);
     if (!file)
     {
         printf(

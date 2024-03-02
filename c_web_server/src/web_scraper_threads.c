@@ -12,7 +12,7 @@
 // available from thread_pool_add_task. Only the primary thread adds
 // and removes tasks for the thread pool.
 static void *
-worker_thread (void *p_arg)
+worker_thread (void * p_arg)
 {
     thread_pool_t *p_pool = (thread_pool_t *)p_arg;
 
@@ -53,7 +53,7 @@ worker_thread (void *p_arg)
 }
 
 int
-thread_pool_init (thread_pool_t *p_pool, int num_threads)
+thread_pool_init (thread_pool_t * p_pool, int num_threads)
 {
     if (pthread_mutex_init(&p_pool->lock, NULL) != 0)
     {
@@ -93,7 +93,7 @@ thread_pool_init (thread_pool_t *p_pool, int num_threads)
 }
 
 int
-thread_pool_add_task (thread_pool_t *p_pool, task_function func, void *p_arg)
+thread_pool_add_task (thread_pool_t * p_pool, task_function func, void * p_arg)
 {
     pthread_mutex_lock(&p_pool->lock);
 
@@ -114,7 +114,7 @@ thread_pool_add_task (thread_pool_t *p_pool, task_function func, void *p_arg)
 }
 
 void
-thread_pool_destroy (thread_pool_t *p_pool)
+thread_pool_destroy (thread_pool_t * p_pool)
 {
     // Signal for all threads to stop and exit the worker thread function.
     pthread_mutex_lock(&p_pool->lock);
@@ -141,7 +141,7 @@ thread_pool_destroy (thread_pool_t *p_pool)
 // still extra URLs to process. Responsible for freeing the dynamic memory for
 // the URL that is allocated in queue dequeue.
 void *
-scrape_url_task (void *p_arg)
+scrape_url_task (void * p_arg)
 {
     queue_t *p_url_queue = (queue_t *)p_arg; // Cast arg to the appropriate type
     while (true)

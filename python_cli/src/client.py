@@ -8,7 +8,7 @@ def receive_full_message(sock, buffer_size=1024):
         chunk = sock.recv(buffer_size)
         message += chunk
         if len(chunk) < buffer_size:
-            # There is no more data being sent.
+            # There is no more data being sent based on a full buffer not being sent.
             break
     return message
 

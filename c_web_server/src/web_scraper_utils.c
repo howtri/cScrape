@@ -8,7 +8,7 @@
 // Simple djb hash implementation for fast non cryptographical hashing
 // https://codereview.stackexchange.com/questions/85556/simple-string-hashing-algorithm-implementation
 static size_t
-util_djb_hash (const char *p_cp)
+util_djb_hash (const char * p_cp)
 {
     if (p_cp == NULL)
     {
@@ -24,9 +24,9 @@ util_djb_hash (const char *p_cp)
 }
 
 int
-util_create_filename (const char *p_url,
-                      char       *p_filename_buffer,
-                      size_t      buffer_size)
+util_create_filename (const char * p_url,
+                      char       * p_filename_buffer,
+                      size_t       buffer_size)
 {
     // Generate filename
     size_t hash = util_djb_hash(p_url);
