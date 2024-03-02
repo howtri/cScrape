@@ -78,7 +78,7 @@ send_file_contents (int socket_fd, FILE * p_file)
 // not enqueued or dequeued while we are enqueuing. Then prompts the worker
 // threads to begin scraping by adding a task to the thread pool.
 int
-handle_scrape_new_request (int socket_fd, char * p_url, queue_t *p_url_queue)
+handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queue)
 {
     // Validate the url.
     if ((NULL == p_url) || (NULL == p_url_queue))

@@ -33,7 +33,7 @@ typedef struct thread_pool {
  * @param num_threads The number of worker threads to create in the thread pool.
  * @return 0 on success, -1 on failure to initialize the thread pool or create threads.
  */
-int thread_pool_init(thread_pool_t *p_pool, int num_threads);
+int thread_pool_init(thread_pool_t * p_pool, int num_threads);
 
 /**
  * @brief Adds a new task to the thread pool for execution.
@@ -46,7 +46,7 @@ int thread_pool_init(thread_pool_t *p_pool, int num_threads);
  * @param arg The argument to be passed to the task function.
  * @return 0 on successfully adding the task to the pool, -1 if the task could not be added.
  */
-int thread_pool_add_task(thread_pool_t *p_pool, task_function func, void *p_arg);
+int thread_pool_add_task(thread_pool_t * p_pool, task_function func, void * p_arg);
 
 /**
  * @brief Cleans up the thread pool and terminates all its worker threads.
@@ -57,7 +57,7 @@ int thread_pool_add_task(thread_pool_t *p_pool, task_function func, void *p_arg)
  * 
  * @param pool Pointer to the thread pool to be destroyed.
  */
-void thread_pool_destroy(thread_pool_t *p_pool);
+void thread_pool_destroy(thread_pool_t * p_pool);
 
 /**
  * @brief Task function that continuously processes URLs from a queue until a NULL URL is encountered.
