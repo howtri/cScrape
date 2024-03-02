@@ -5,13 +5,13 @@
 #include "web_scraper_queue.h"
 
 /**
- * Handler function to be executed by threads to detect
- * urls to be scraped from the queue and initiate scrape_web_page.
+ * Connects to a HTTP host as a client, sends a simple HTTP request,
+ * writes the reply to disk on the local machine.
  * 
- * @param url The queue containing URLs.
+ * @param p_url The URL to scrape.
  * @return int Returns EXIT_SUCCESS on success, EXIT_FAILURE on failure.
  */
-int handle_web_scrape (queue_t * p_url_queue);
+int scrape_web_page (const char * p_url);
 
 #endif /* WEB_SCRAPER_SCRAPING_H */
 

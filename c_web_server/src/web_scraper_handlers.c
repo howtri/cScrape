@@ -7,9 +7,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <errno.h>
+#include "web_scraper_globals.h"
 #include "web_scraper_queue.h"
 #include "web_scraper_handlers.h"
 #include "web_scraper_utils.h"
+#include "web_scraper_threads.h"
 
 #define MESSAGE_SIZE 1024
 
@@ -71,6 +73,9 @@ send_file_contents (int socket_fd, FILE *p_file)
     return EXIT_SUCCESS;
 }
 
+// Accepts client requests that contain a URL and adds to the queue to be scraped asynchronously.
+// Uses the global queue mutex to ensure that URLs are not enqueued or dequeued while we are
+// enqueuing. Then prompts the worker threads to begin scraping by adding a task to the thread pool.
 int
 handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
 {
@@ -88,11 +93,23 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
         printf("URL does not start with a valid scheme.\n");
         return EXIT_FAILURE;
     }
+    
+    // Critical Path: Prevent the queue from being accessed by multiple threads at the same time.
+    pthread_mutex_lock(&global_queue_mutex);
 
     // Enqueue valid url
     if (queue_enqueue(p_url_queue, p_url, strlen(p_url)) == EXIT_FAILURE)
     {
         fprintf(stderr, "Failed to add URL %s to the queue.\n", p_url);
+        return EXIT_FAILURE;
+    }
+
+    pthread_mutex_unlock(&global_queue_mutex);
+
+    // Signal the worker threads that there is a URL to scrape by adding to the pool tasks.
+    if (thread_pool_add_task(&global_thread_pool, scrape_url_task, (void *)p_url_queue) == EXIT_FAILURE)
+    {
+        fprintf(stderr, "Failed to add the thread task.\n");
         return EXIT_FAILURE;
     }
 

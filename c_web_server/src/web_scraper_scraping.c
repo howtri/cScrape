@@ -125,7 +125,7 @@ receive_http_response_and_write_to_file (int sock, const char * filename)
     return EXIT_SUCCESS;
 }
 
-static int
+int
 scrape_web_page (const char * p_url)
 {
     if (NULL == p_url)
@@ -171,32 +171,6 @@ scrape_web_page (const char * p_url)
     receive_http_response_and_write_to_file(sock, filename);
 
     close(sock);
-    return EXIT_SUCCESS;
-}
-
-// Pops a URL off of the queue and makes calls to scrape the URL. Responsible
-// for freeing the dynamic memory for the URL that is allocated in queue dequeue.
-int
-handle_web_scrape (queue_t *p_url_queue)
-{
-    // Check if URL is on the queue to scrape
-    char *p_url = queue_dequeue(p_url_queue);
-    if (NULL == p_url)
-    {
-        fprintf(stderr, "URL to parse is NULL.\n");
-        return EXIT_FAILURE;
-    }
-    // Scrape URL and write to disk
-    if (scrape_web_page(p_url) == EXIT_FAILURE)
-    {
-        fprintf(stderr, "Failed to scrape %s.\n", p_url);
-        free(p_url);
-        p_url = NULL;
-        return EXIT_FAILURE;
-    }
-
-    free(p_url);
-    p_url = NULL;
     return EXIT_SUCCESS;
 }
 

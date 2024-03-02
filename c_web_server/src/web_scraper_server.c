@@ -221,7 +221,7 @@ handling_loop (int listening_socket, int max_connections, queue_t *p_url_queue)
 
         process_existing_connections(
             p_fds, max_connections, buffer_size, p_url_queue);
-        if (count_run > 2)
+        if (count_run > 15)
         {
             printf("Breaking from the loop for testing purposes.\n");
             break;
