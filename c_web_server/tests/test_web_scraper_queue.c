@@ -1,11 +1,11 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <stdint.h>
 #include <cmocka.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 #include "web_scraper_queue.h"
 
 // The linker expects the mocked syscalls to be present in every function, so
