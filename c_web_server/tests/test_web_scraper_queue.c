@@ -7,6 +7,19 @@
 #include <string.h>
 #include "web_scraper_queue.h"
 
+// The linker expects the mocked syscalls to be present in every function, so unfortunately here they are even if not required.
+
+ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags) {
+    check_expected(sockfd);
+    check_expected(buf);
+    check_expected(len);
+    check_expected(flags);
+
+    return mock_type(ssize_t);
+}
+
+// End of mocked syscalls.
+
 static void
 test_queue_create_destroy (void **state)
 {
@@ -27,7 +40,7 @@ test_queue_enqueue_dequeue (void **state)
     queue_t *p_queue = queue_create();
     assert_non_null(p_queue);
 
-    // Enqueue a few URLs
+    // Enqueue test URLs
     char *p_url1 = "http://example.com/1";
     char *p_url2 = "http://example.com/2";
     char *p_url3 = "http://example.com/3";
@@ -40,17 +53,17 @@ test_queue_enqueue_dequeue (void **state)
                      EXIT_SUCCESS);
 
     // Dequeue and check the URLs in order
-    char *dequeuedUrl1 = queue_dequeue(p_queue);
-    assert_string_equal(dequeuedUrl1, p_url1);
-    free(dequeuedUrl1); // Remember to free the duplicated URL
+    char *dequeued_url_1 = queue_dequeue(p_queue);
+    assert_string_equal(dequeued_url_1, p_url1);
+    free(dequeued_url_1);
 
-    char *dequeuedUrl2 = queue_dequeue(p_queue);
-    assert_string_equal(dequeuedUrl2, p_url2);
-    free(dequeuedUrl2);
+    char *dequeued_url_2 = queue_dequeue(p_queue);
+    assert_string_equal(dequeued_url_2, p_url2);
+    free(dequeued_url_2);
 
-    char *dequeuedUrl3 = queue_dequeue(p_queue);
-    assert_string_equal(dequeuedUrl3, p_url3);
-    free(dequeuedUrl3);
+    char *dequeued_url_3 = queue_dequeue(p_queue);
+    assert_string_equal(dequeued_url_3, p_url3);
+    free(dequeued_url_3);
 
     // Check the queue is empty
     assert_null(queue_dequeue(p_queue));
@@ -78,15 +91,6 @@ test_queue_empty_after_last_dequeue (void **state)
     assert_null(queue_dequeue(p_queue));
 
     queue_destroy(&p_queue);
-}
-
-// Mock function for socket
-int
-__wrap_socket (int domain, int type, int protocol)
-{
-    // Use mock_type and will_return from CMocka to control the behavior of this
-    // mock function
-    return mock_type(int);
 }
 
 int

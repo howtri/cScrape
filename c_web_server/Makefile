@@ -11,7 +11,7 @@ CFLAGS = -std=c17 -D_POSIX_C_SOURCE=200809L -g -Wall -I$(INCDIR)
 LDFLAGS = -lcmocka
 
 # Use --wrap linker flag for mocking system calls
-LDWRAP = -Wl,--wrap=socket
+LDWRAP = -Wl,--wrap=send
 
 SRCDIR = src
 INCDIR = include

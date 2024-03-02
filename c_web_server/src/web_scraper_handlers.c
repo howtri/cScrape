@@ -1,4 +1,4 @@
-// Main file for the web server web scraper.
+// Contains logic to handle all client requests.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,6 +127,7 @@ handle_return_scrape_request (int socket_fd, char *p_url)
             perror("send failed");
             return EXIT_FAILURE;
         }
+        return EXIT_SUCCESS;
     }
     int result = send_file_contents(socket_fd, file);
     fclose(file);
@@ -136,6 +137,7 @@ handle_return_scrape_request (int socket_fd, char *p_url)
         fprintf(stderr, "Failed to send scraped contents.\n");
         const char *msg = "FAILURE: Failed to send scraped contents.\n";
         send(socket_fd, msg, strlen(msg), 0);
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

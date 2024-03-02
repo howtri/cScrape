@@ -1,4 +1,4 @@
-// Queue data structure to store websites to be scraped.
+// Queue data structure to store URLs to be scraped.
 
 #include <string.h>
 #include <stdlib.h>
