@@ -1,0 +1,9 @@
+HTTP/1.1 301 Moved Permanently
+Date: Sat, 02 Mar 2024 21:41:43 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 36
+Connection: close
+Location: /
+
+<a href="/">Moved Permanently</a>.
+

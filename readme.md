@@ -1,65 +1,44 @@
 # Overview
-C web server that scrapes requested web pages and stores the contents locally on disk (to a certain amount). Python CLI to make a request to the web server.
+howell_17d_19_1 is a tool that consists of a C Web Server and a Python Client to interact with the Web Server. The Web Server accepts requests from the Client and returns a response based on one of three routes. The first route allows a client to request a HTTP website be scraped asynchronously, the second is a request for the content of a HTTP website scraped in the past, and the third is for invalid requests. The C web server can handle multiple client connections simultaneously and dispatches scraping requests to a pool of threads.
 
-## C Web Server
-Features: multi-threaded
+## Usage
 
-Accepts:
-Request to scrape a webpage
-Request for a web pages content
+Required tools:
+```
+git gcc make cmake cmocka-dev
+```
 
-### Architecture
-Diagram
+If testing is not desired then only the following are required
 
-Reason for Monolith
-- ease of initial development
-- not multiple teams/developers for splitting work
-- expected low number of qps
+```
+gcc make
+```
 
-## Python CLI
-Use sockets to make requests to the C webserver.
+Running the Web Server
+```
+make -C c_web_server/
+c_web_server/bin/web_scraper
+```
 
-## Push from CLI
-git -c http.sslVerify=false clone https://<user.name>>:<PAT>@code.levelup.cce.af.mil/tristan.howell/howell_17d_19_1.git
+Making requests to the already running webserver from the Client
+```
+python3 python_cli/src/client.py 2 http://books.toscrape.com/
+python3 python_cli/src/client.py 1 http://books.toscrape.com/
+```
 
-git -c http.sslVerify=false push origin main
+## Testing
+Unit tests are implemented using a third party library, CMocka. This library is used to mock syscalls and other custom functions during unit tests.
 
-## Assumptions
-Pages will not be re-scraped upon submission
-Pages scraped before can be added to the queue but no changes will take place
+```
+make -C c_web_server/ test
+```
 
-## Pages that we can scrape
-Not all websites allow web scraping, also we only allow HTTP (not HTTPS).
+## Cleaning
+Clean the directories after testing.
 
-## Application only works on Linux due to file path processing
+```
+make -C c_web_server/ test
+```
 
-##
-Operates from Current working dir: /mnt/c/Users/15714/Documents/howell_17d_19_1/howell_17d_19_1/c_web_server
-meaning we can use the data dir within it
-
-## Future improvements
-Use a hashmap for files that have already been scraped instead of checking if the file exists
-if this was much bigger we would likely want to use object storage somewhere else or a volume mounted
-for multiple machines so we are able to scrape and return from multiple machines (currnently our app is stateful)
-
-Make filepaths work for for Windows and Linux
-
-File names of a max 255 are allowed and a max of 511 for path size
-
-Security Considerations: Path traversal etc.
-
-Regex for URL parsing.
-
-Potential risk of the same URL being submitted at the same time and scraping twice
-
-Adding more tasks to be accomplished by worker threads. This would neccesitate locking the thread pool as well
-so multiple tasks arent added at the same time. Currently only the primary thread adds/removed thread pool tasks.
-
-Potentially add a limit to our URL queue. There is a scenario where the URL queue is flooded with requests and we
-are signaled to shutdown. In this case the application would continue processing requests for a while. Is this what we want
-
-It could also potentially get stuck on a URL and it would prevent exiting.
-
-Statistics from the threads on join. Or just more mature logging.
-
-Network comm could be more robust. There are some cases when the full buffer is not sent but more data is being sent.
+## More Information
+See the documentation folder!
