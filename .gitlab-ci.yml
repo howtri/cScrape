@@ -5,6 +5,7 @@ build:
   script:
     - yum install -y gcc make
     - cd c_web_server
+    - mkdir bin
     - make
     - ls
     - ls/bin
