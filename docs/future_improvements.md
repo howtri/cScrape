@@ -38,3 +38,6 @@ We currently check if a file exists to determine if a website has been scraped a
 
 ### Regex
 Parse URLs with Regex to improve on the simple check starts with http://
+
+### Additional Code Coverage
+Add more unit tests to cover additional handler paths and files.
