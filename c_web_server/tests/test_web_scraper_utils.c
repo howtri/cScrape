@@ -4,6 +4,7 @@
 #include <cmocka.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include "web_scraper_utils.h"
 
 // The linker expects the mocked syscalls to be present in every function, so

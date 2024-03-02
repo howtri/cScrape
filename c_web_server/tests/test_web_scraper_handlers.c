@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include "web_scraper_queue.h" // Assuming this is where queue_t and related functions are defined.
 #include "web_scraper_handlers.h"
