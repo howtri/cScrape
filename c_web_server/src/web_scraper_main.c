@@ -30,15 +30,21 @@ main ()
         return EXIT_FAILURE;
     }
 
-    init_globals();
+    // Creates our thread pool. Currently the thread pool is only used for webscraping tasks.
+    if (init_globals() == EXIT_FAILURE)
+    {
+        cleanup_server(listening_socket);
+        return EXIT_FAILURE;
+    }
 
     // Continually monitors for new and established connections for any processing that can
     // take place. Accepts up to MAX_CONNECTIONS at a time before load-shedding by dropping
     // any new connections that are made until existing connections complete.
     handling_loop(listening_socket, MAX_CONNECTIONS, p_url_queue);
 
-    // Web Scraping Threads continually monitor the url queue for any new urls to scrape.
-    // TODO:
+    // Joins all of the threads and destroys the threadpool + mutex. This needs
+    // to be done before the queue is destroyed for any threads that are still processing.
+    destroy_globals();
 
     // Free the url queue and all nodes within it, including all url strings.
     if (queue_destroy(&p_url_queue) == EXIT_FAILURE)
@@ -48,7 +54,7 @@ main ()
     }
     p_url_queue = NULL;
 
-    destroy_globals();
+    
     // Free the socket the webserver is listening on.
     cleanup_server(listening_socket);
     return EXIT_SUCCESS;

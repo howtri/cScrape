@@ -118,6 +118,7 @@ receive_http_response_and_write_to_file (int sock, const char * filename)
     if (bytesRead < 0)
     {
         perror("Failed to recv from the server");
+        fclose(p_file);
         return EXIT_FAILURE;
     }
 

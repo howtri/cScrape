@@ -9,9 +9,14 @@ thread_pool_t global_thread_pool;
 
 // Create our queue mutex and thread pool to be used by our handlers
 // and threading functions. Create thread pool for worker functions.
-void init_globals() {
+int init_globals() {
     pthread_mutex_init(&global_queue_mutex, NULL);
-    thread_pool_init(&global_thread_pool, THREAD_COUNT);
+    if (thread_pool_init(&global_thread_pool, THREAD_COUNT) == EXIT_FAILURE)
+    {
+        pthread_mutex_destroy(&global_queue_mutex);
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
 
 // Clean up mutex and all threads.

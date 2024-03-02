@@ -9,8 +9,10 @@ extern thread_pool_t global_thread_pool;
 
 /**
  * @brief Create global mutex and thread pool. Create threads in thread pool.
+ * 
+ * @return EXIT_FAILURE on failure, EXIT_SUCCESS on success.
  */
-void init_globals(void);
+int init_globals(void);
 
 /**
  * @brief Destroy mutex and thread pool (including all threads within).

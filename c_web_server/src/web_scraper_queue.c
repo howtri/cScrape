@@ -42,6 +42,7 @@ node_create (char *p_url, int url_length)
     if (NULL == url_mem)
     {
         perror("Failed to allocate memory");
+        free(new_node);
         return NULL;
     }
 

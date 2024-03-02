@@ -86,7 +86,6 @@ handle_scrape_new_request (int socket_fd, char *p_url, queue_t *p_url_queue)
         return EXIT_FAILURE;
     }
 
-    // TODO: Regex
     if (!((strncmp(p_url, "http://", 7) == 0)
           || (strncmp(p_url, "https://", 8) == 0)))
     {

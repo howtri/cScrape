@@ -47,3 +47,5 @@ Make filepaths work for for Windows and Linux
 File names of a max 255 are allowed and a max of 511 for path size
 
 Security Considerations: Path traversal etc.
+
+Regex for URL parsing.
