@@ -10,6 +10,9 @@ CFLAGS = -std=c17 -D_POSIX_C_SOURCE=200809L -g -Wall -I$(INCDIR)
 # Flags for linking CMocka
 LDFLAGS = -lcmocka
 
+# Libraries for linking
+LDLIBS = -lpthread
+
 # Use --wrap linker flag for mocking system calls
 LDWRAP = -Wl,--wrap=send
 
@@ -41,13 +44,13 @@ all: $(TARGET)
 
 # Build rule for main target
 $(TARGET): $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $(SRCS)
+	$(CC) $(CFLAGS) -o $@ $(SRCS) $(LDLIBS)
 
 # Rule to compile and run tests
 test: $(TEST_TARGETS)
 
 $(TEST_TARGETS): $(BINDIR)/%: $(TESTDIR)/%.c $(OBJS) $(HEADERS)
-	$(CC) $(CFLAGS) $(LDWRAP) -o $@ $< $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(LDWRAP) -o $@ $< $(OBJS) $(LDFLAGS) $(LDLIBS)
 
 # Run tests
 	@for test in $@; do \
