@@ -6,6 +6,8 @@ build:
     - yum install -y gcc make
     - cd c_web_server
     - make
+    - ls
+    - ls/bin
   artifacts:
     paths:
       - c_web_server/bin/
