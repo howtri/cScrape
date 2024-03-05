@@ -109,7 +109,7 @@ handle_scrape_new_request (int socket_fd, char * p_url, queue_t * p_url_queue)
     // Signal the worker threads that there is a URL to scrape by adding to the
     // pool tasks.
     if (thread_pool_add_task(
-            &global_thread_pool, scrape_url_task, (void *)p_url_queue)
+            &global_thread_pool, scrape_url_task_thread, p_url_queue)
         == EXIT_FAILURE)
     {
         fprintf(stderr, "Failed to add the thread task.\n");

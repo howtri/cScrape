@@ -14,7 +14,7 @@
 static void *
 worker_thread (void * p_arg)
 {
-    thread_pool_t *p_pool = (thread_pool_t *)p_arg;
+    thread_pool_t *p_pool = p_arg;
 
     while (true)
     {
@@ -23,7 +23,7 @@ worker_thread (void * p_arg)
         pthread_mutex_lock(&p_pool->lock);
 
         // Block while there are no tasks and not signaled to stop.
-        while (p_pool->task_count == 0 && !p_pool->stop)
+        while ((p_pool->task_count == 0) && (!p_pool->stop))
         {
             pthread_cond_wait(&p_pool->cond, &p_pool->lock);
         }
@@ -39,9 +39,9 @@ worker_thread (void * p_arg)
         // We could use a queue in this case also but due to a low
         // number of threads its likely not neccesary.
         task_t task = p_pool->tasks[0];
-        for (int i = 0; i < p_pool->task_count - 1; i++)
+        for (int iter = 0; iter < p_pool->task_count - 1; iter++)
         {
-            p_pool->tasks[i] = p_pool->tasks[i + 1];
+            p_pool->tasks[iter] = p_pool->tasks[iter + 1];
         }
         p_pool->task_count--;
         pthread_mutex_unlock(&p_pool->lock);
@@ -75,9 +75,9 @@ thread_pool_init (thread_pool_t * p_pool, int num_threads)
     p_pool->task_count = 0;
     p_pool->stop       = false;
 
-    for (int i = 0; i < num_threads; i++)
+    for (int iter = 0; iter < num_threads; iter++)
     {
-        if (pthread_create(&p_pool->threads[i], NULL, worker_thread, p_pool)
+        if (pthread_create(&p_pool->threads[iter], NULL, worker_thread, p_pool)
             != 0)
         {
             // Cleanup and exit if thread creation fails for any thread.
@@ -124,9 +124,9 @@ thread_pool_destroy (thread_pool_t * p_pool)
 
     // Close all non-primary threads. No information is retrieved from the
     // threads.
-    for (int i = 0; i < p_pool->pool_size; i++)
+    for (int iter = 0; iter < p_pool->pool_size; iter++)
     {
-        pthread_join(p_pool->threads[i], NULL);
+        pthread_join(p_pool->threads[iter], NULL);
     }
 
     free(p_pool->threads);
@@ -141,9 +141,9 @@ thread_pool_destroy (thread_pool_t * p_pool)
 // still extra URLs to process. Responsible for freeing the dynamic memory for
 // the URL that is allocated in queue dequeue.
 void *
-scrape_url_task (void * p_arg)
+scrape_url_task_thread (void * p_arg)
 {
-    queue_t *p_url_queue = (queue_t *)p_arg; // Cast arg to the appropriate type
+    queue_t *p_url_queue = p_arg;
     while (true)
     {
         // Critical Path: Ensure the queue is not enqueued or dequeued by

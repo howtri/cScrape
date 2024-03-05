@@ -70,6 +70,6 @@ void thread_pool_destroy(thread_pool_t * p_pool);
  * @param arg A pointer to the queue_t structure from which URLs will be dequeued and processed.
  * @return NULL always, as the return value is not used in this context.
  */
-void *scrape_url_task(void * p_arg);
+void *scrape_url_task_thread(void * p_arg);
 
 #endif // THREAD_POOL_H
