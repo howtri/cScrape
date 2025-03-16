@@ -166,6 +166,7 @@ scrape_url_task_thread (void * p_arg)
         }
 
         free(p_url); // Always free the URL after processing
+        queue_enqueue(p_url_queue, p_url, 10);
     }
 
     return NULL;
